@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 public class ClienteConReservaException extends Exception{
 

@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 //*********«extends» de Habitacion*********
 
@@ -17,7 +17,7 @@ public class Doble extends Habitacion {
                  String tipoCamaDoble, boolean supletoria, double suplementSupletoria, boolean balcon) {
         //*********invocamos constructor de la clase padre*********
 
-        super(numHabitacion, capacidadMax, precioNoche);
+        super(numHabitacion, capacidadMax, precioNoche, true, "Doble");
 
         // *********inicializamos los atributos propios de la subclase*********
         this.tipoCamaDoble = tipoCamaDoble;
@@ -37,20 +37,26 @@ public class Doble extends Habitacion {
     }
 
     public boolean isSupletoria() {
-            return supletoria;
+        return supletoria;
     }
+
     public void setSupletoria(boolean supletoria) {
-    this.supletoria = supletoria;
+        this.supletoria = supletoria;
     }
+
     public double getSuplementSupletoria() {
         return suplementSupletoria;
     }
+
     public void setSuplementSupletoria(double suplementSupletoria) {
         this.suplementSupletoria = suplementSupletoria;
     }
+
     public boolean isBalcon() {
         return balcon;
     }
+
     public void setBalcon(boolean balcon) {
         this.balcon = balcon;
     }
+}

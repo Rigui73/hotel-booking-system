@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 public class Suite extends Habitacion{
 
@@ -18,7 +18,7 @@ public class Suite extends Habitacion{
 
         //*********Invocamos constructor padre*********
 
-        super(numHabitacion, capacidad, precioNoche, categoria);
+        super(numHabitacion, capacidad, precioNoche, true, categoria);
 
         this.numAmbientes = numAmbientes;
         this.jacuzzi = jacuzzi;

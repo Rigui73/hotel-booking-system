@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class Hotel {
 
     //setter para meter habitaciones a un hotel
 
-    public void añadirHabitacion(Habitacion habitacion){
+    public void anadirHabitacion(Habitacion habitacion){
         this.habitaciones.add(habitacion);
     }
 

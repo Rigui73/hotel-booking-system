@@ -1,7 +1,6 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
-public class HotelDuplicadoException extend Exception{
-
+public class HotelDuplicadoException extends Exception{
     public HotelDuplicadoException(String mensaje){
         super(mensaje);
     }
