@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="RoomServiceDev:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/RoomServiceDev_jar</output-path>
-    <root id="archive" name="RoomServiceDev.jar">
-      <element id="module-output" name="RoomServiceDev" />
-    </root>
-  </artifact>
-</component>
