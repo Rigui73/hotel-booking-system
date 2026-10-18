@@ -3,7 +3,7 @@
 ![Java](https://img.shields.io/badge/Java-11-orange?logo=openjdk&logoColor=white)
 ![Project](https://img.shields.io/badge/Project-Hotel%20Reservations-blue)
 ![Repository](https://img.shields.io/badge/Repository-Private-lightgrey)
-[![Telegram](https://img.shields.io/badge/Telegram-Team%20Chat-26A5E4?logo=telegram&logoColor=white)](https://t.me/)
+[![Telegram](https://img.shields.io/badge/Telegram-Team%20Chat-26A5E4?logo=telegram&logoColor=white)](https://web.telegram.org/k/#-5417727149)
 
 ## Descripción
 
