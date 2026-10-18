@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 public class Simple extends Habitacion {
 
@@ -14,7 +14,7 @@ public class Simple extends Habitacion {
 
         //*********Invocamos constructor padre*********
 
-        super(numHabitacion,capacidad,precioNoche, categoria);
+        super(numHabitacion,capacidad,precioNoche, true, categoria);
 
         //inicializamos atributos propios
         this.medidaCama = medidaCama;

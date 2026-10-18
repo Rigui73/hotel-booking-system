@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 import java.util.Date;
 
@@ -22,7 +22,7 @@ public class Reserva {
 
     public Reserva(int idReserva, Date fechaReserva, Date fechaEntrada,
                    Date fechaSalida, int numHuespedes, double importeTotal, boolean estado,
-                   String nombreHotel, int numHabitacion, dniCliente){
+                   String nombreHotel, int numHabitacion, String dniCliente){
 
         this.idReserva = idReserva;
         this.fechaReserva = fechaReserva;

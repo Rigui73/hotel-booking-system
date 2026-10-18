@@ -1,5 +1,5 @@
 
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 public abstract class Habitacion{
 
@@ -18,7 +18,7 @@ public abstract class Habitacion{
         this.capacidad = capacidad;
         this.precioNoche = precioNoche;
         this.categoria = categoria;
-        this.disponible = true;
+        this.disponible = disponible;
     }
 
     // --------GETTERS y SETTERS ---------
@@ -27,10 +27,10 @@ public abstract class Habitacion{
         return numHabitacion;
     }
     public void setNumHabitacion(int numHabitacion) {
-        this.numHabitacion = numHabitacion ;
+        this.numHabitacion = numHabitacion;
     }
     public int getCapacidad() {
-        return capacidad
+        return capacidad;
     }
     public void setCapacidad(int capacidad) {
         this.capacidad = capacidad;
@@ -44,7 +44,7 @@ public abstract class Habitacion{
     public String getCategoria(){
         return categoria;
     }
-    public void setCategoria(){
+    public void setCategoria(String categoria){
         this.categoria = categoria;
     }
 

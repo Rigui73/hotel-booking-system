@@ -1,4 +1,4 @@
-package RoomServDev.modelo;
+package RoomServDev.model;
 
 //*********extends Exception*********
 
@@ -8,7 +8,7 @@ public class ClienteDuplicadoException extends Exception{
 
     public ClienteDuplicadoException(String mensaje){
         // ********* pasamos el mensaje al constructor del padre (Exception) *********
-        super(mensaje)
+        super(mensaje);
     }
 
 }
