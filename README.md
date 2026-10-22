@@ -39,7 +39,7 @@ Repositorio de una aplicación desarrollada en Java para la gestión de reservas
 
 4. Comprueba que el proyecto tiene configurado el JDK 11.
 
-5. Abre src/Main.java.
+5. Abre src/Main_2.java.
 
 6. Pulsa el botón Run junto al método main() para compilar y ejecutar la aplicación.
 
@@ -54,7 +54,7 @@ javac -d out src/*.java
 Después, ejecuta la aplicación:
 
 ```console
-java -cp out Main
+java -cp out Main_2
 ```
 Estos comandos suponen que las clases Java están directamente dentro de src/, no utilizan declaraciones package y no necesitan bibliotecas externas.
 
