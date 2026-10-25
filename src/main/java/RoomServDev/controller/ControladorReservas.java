@@ -94,8 +94,7 @@ public class ControladorReservas {
         return null;
     }
 
-    // ********* Editar *********
-
+    // Editar: la reserva
     public void editarReserva(int idReserva, LocalDate nuevaEntrada, LocalDate nuevaSalida, int nuevosHuespedes)
             throws ReservaSolapadaException {
 
@@ -110,8 +109,6 @@ public class ControladorReservas {
         datos.modificarReserva(reserva, aDate(nuevaEntrada), aDate(nuevaSalida), nuevosHuespedes);
         reserva.setImporteTotal(calcularImporte(habitacion, nuevaEntrada, nuevaSalida));
     }
-
-    // ********* Cancelar / Eliminar *********
 
     // Cancelar: la reserva queda en el historial pero deja de estar activa
     public void cancelarReserva(int idReserva) {

@@ -164,7 +164,7 @@ public class Datos {
     //4.- MOSTRAR HABITACIONES DE UNA DETERMINADA CATEGORIA
 
     public List<Habitacion> mostrarHabitacionesPorCategoria(String categoria) {
-        List<Habitacion> habitacionesFiltradas = new ArrayList();
+        List<Habitacion> habitacionesFiltradas = new ArrayList<>();
 
         for (Hotel hotel : hoteles) {
             for (Habitacion habitacion : hotel.getHabitaciones()) {
@@ -216,14 +216,16 @@ public class Datos {
                     // la reserva es para la habitacion seleccionada del hotel seleccionado?
                     //incluimos aqui getNumHabitacion() y getNombre en Reserva
 
-                    if (reserva.getNombreHotel().equalsIgnoreCase(hotel.getNombre()) &&
+                    if (reserva.isEstado() &&
+                            reserva.getNombreHotel().equalsIgnoreCase(hotel.getNombre()) &&
                             reserva.getNumHabitacion() == habitacion.getNumHabitacion()) {
+
                         //Validación de fechas
                         if (fechaEntradaSolicitada.before(reserva.getFechaSalida()) &&
                                 fechaSalidaSolicitada.after(reserva.getFechaEntrada())) {
 
                             estaDisponible = false;
-                            break;//salimos del bucle
+                            break;
                         }
                     }
                 }
