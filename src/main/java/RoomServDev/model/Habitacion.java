@@ -1,7 +1,7 @@
 
 package RoomServDev.model;
 
-public abstract class Habitacion{
+public class Habitacion{
 
     // atributos
 

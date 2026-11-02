@@ -1,6 +1,7 @@
 
 import java.time.LocalDate;
 import java.sql.Date;
+import java.util.Scanner;
 
 import RoomServDev.model.Cliente;
 import RoomServDev.model.Doble;
@@ -10,13 +11,21 @@ import RoomServDev.model.Reserva;
 import RoomServDev.model.Simple;
 import RoomServDev.model.Suite;
 
+import RoomServDev.view.vistaMenus;
+
 public class Main {
 
+    Scanner input = new Scanner(System.in);
+
     public static void main(String[] args) {
+
+        Main iniciar = new Main();
+        iniciar.programa();
 
         System.out.println("========================================================");
         System.out.println(" GESTOR DE RESERVAS DE HOTELES - By: ROOM SERVICE DEV");
         System.out.println("========================================================");
+
 
         // Crear hotel
         Hotel hotel = new Hotel(
@@ -142,4 +151,53 @@ public class Main {
 
         System.out.println("\n--- FIN DEL PROGRAMA ---");
     }
+
+    // Inicio del programa principal.
+    void programa(){
+        vistaMenus vista = new vistaMenus();
+        boolean salir = false;
+        char opcion;
+
+        do {
+
+            System.out.println("");
+            System.out.println("1. Opciones de los clientes");
+            System.out.println("2. Opciones de los hoteles.");
+            System.out.println("3. Opciones de las habitaciones.");
+            System.out.println("4. Opciones de las reservas");
+            System.out.println("0. Salir de la aplicación.");
+            System.out.println("");
+
+            opcion = pedirOpcionMenus();
+
+            switch (opcion){
+                case '1':
+                    vista.mostrarMenuClientes();
+                    break;
+                case '2':
+                    vista.mostrarMenuHoteles();
+                    break;
+                case '3':
+                    vista.mostrarMenuHabitaciones();
+                    break;
+                case '4':
+                    vista.mostrarMenuReservas();
+                    break;
+                case '0':
+                    salir = true;
+            }
+
+        } while (!salir);
+    }
+
+    char pedirOpcionMenus(){
+        String respuesta;
+        System.out.print("Elige una opción: ");
+        respuesta = input.nextLine();
+        if (respuesta.isEmpty()){
+            respuesta = " ";
+        }
+        return respuesta.charAt(0);
+    }
+
 }

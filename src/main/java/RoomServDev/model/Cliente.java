@@ -2,16 +2,12 @@ package RoomServDev.model;
 
 public class Cliente {
 
-    // ********* Atributos  *********
-
     private String nombre;
     private String apellido1;
     private String apellido2;
     private String dni;
     private int telefono;
     private String email;
-
-    // ********* Constructor  *********
 
     public Cliente(String nombre, String apellido1, String apellido2,
                    String dni, int telefono, String email) {
@@ -22,10 +18,6 @@ public class Cliente {
         this.telefono = telefono;
         this.email = email;
     }
-
-
-    // *********GETTERS y SETTERS*********
-
 
     public String getNombre() {
         return nombre;
@@ -62,6 +54,7 @@ public class Cliente {
     public int getTelefono(){
         return telefono;
     }
+
     public void setTelefono(int telefono){
         this.telefono = telefono;
     }

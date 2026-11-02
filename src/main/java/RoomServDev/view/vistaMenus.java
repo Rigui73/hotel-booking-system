@@ -1,251 +1,521 @@
 package RoomServDev.view;
 
-import RoomServDev.model.*;
+import RoomServDev.model.Cliente;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 
 public class vistaMenus {
-    private Scanner input = new Scanner(System.in);
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    Scanner input = new Scanner(System.in);
 
-    // ***********************************************************
-    // MENÚS PRINCIPALES (Retornan la opción al Controlador)
-    // ***********************************************************
-    public char mostrarMenuClientes() {
-        System.out.println("\n--- GESTIÓN DE CLIENTES ---");
-        System.out.println("1. Listar clientes.");
-        System.out.println("2. Añadir cliente.");
-        System.out.println("3. Editar cliente.");
-        System.out.println("4. Eliminar cliente.");
-        System.out.println("0. Volver al menú principal.\n");
-        return pedirOpcionMenus();
+    public void mostrarMenuClientes(){
+        boolean salir = false;
+        char opcion;
+
+        do {
+            System.out.println("");
+            System.out.println("1. Listar clientes.");
+            System.out.println("2. Añadir clientes.");
+            System.out.println("3. Editar clientes.");
+            System.out.println("4. Eliminar clientes.");
+            System.out.println("0. Volver al menu prinicpal.");
+            System.out.println("");
+
+            opcion = pedirOpcionMenus();
+
+            switch (opcion){
+                case '1':
+                    listarClientes();
+                    break;
+                case '2':
+                    anadirClientes();
+                    break;
+                case '3':
+                    editarClientes();
+                    break;
+                case '4':
+                    eliminarCliente();
+                    break;
+                case '0':
+                    salir = true;
+            }
+
+        } while (!salir);
+
     }
 
-    public char mostrarMenuHoteles() {
-        System.out.println("\n--- GESTIÓN DE HOTELES ---");
-        System.out.println("1. Listar hoteles.");
-        System.out.println("2. Añadir hotel.");
-        System.out.println("3. Editar hotel.");
-        System.out.println("4. Eliminar hotel.");
-        System.out.println("0. Volver al menú principal.\n");
-        return pedirOpcionMenus();
+    void listarClientes(){
+        System.out.println("--- Listado de los clientes disponibles: ---");
+        System.out.println("");
+
+        // Listar los clientes
     }
 
-    public char mostrarMenuHabitaciones() {
-        System.out.println("\n--- GESTIÓN DE HABITACIONES ---");
-        System.out.println("1. Listar habitaciones de un hotel.");
-        System.out.println("2. Añadir habitación.");
-        System.out.println("0. Volver al menú principal.\n");
-        return pedirOpcionMenus();
+    void anadirClientes(){
+        System.out.println("--- Añadir un nuevo cliente: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el nombre del nuevo cliente: ");
+        String nombreCliente = input.nextLine();
+
+        System.out.print("Introduce el primer apellido del nuevo cliente: ");
+        String apellido1Cliente = input.nextLine();
+
+        System.out.print("Introduce el segundo apellido del nuevo cliente: ");
+        String apellido2Cliente = input.nextLine();
+
+        System.out.print("Introduce el dni del nuevo cliente: ");
+        String dniCliente = input.nextLine();
+
+        System.out.print("Introduce el teléfono del nuevo cliente: ");
+        int telefonoCliente = input.nextInt();
+        input.nextLine();
+
+        System.out.print("Introduce el correo del nuevo cliente: ");
+        String correoCliente = input.nextLine();
+
+        // Crear cliente
     }
 
-    public char mostrarMenuReservas() {
-        System.out.println("\n--- GESTIÓN DE RESERVAS ---");
-        System.out.println("1. Listar reservas.");
-        System.out.println("2. Añadir reserva.");
-        System.out.println("3. Cancelar reserva.");
-        System.out.println("0. Volver al menú principal.\n");
-        return pedirOpcionMenus();
-    }
+    void editarClientes(){
+        System.out.println("--- Editar un cliente: ---");
+        System.out.println("");
 
-    // ***********************************************************
-    // CLIENTES
-    // ***********************************************************
-    public void listarClientes(List<Cliente> listaClientes) {
-        System.out.println("--- Listado de clientes ---");
-        for (Cliente c : listaClientes) {
-            System.out.println(c.toString());
-        }
-    }
-
-    public Cliente anadirCliente() {
-        System.out.println("--- Añadir nuevo cliente ---");
-        System.out.print("Nombre: ");
-        String nombre = input.nextLine();
-        System.out.print("Primer apellido: ");
-        String apellido1 = input.nextLine();
-        System.out.print("Segundo apellido: ");
-        String apellido2 = input.nextLine();
-        System.out.print("DNI: ");
+        System.out.print("Introduce el dni del cliente: ");
         String dni = input.nextLine();
-        System.out.print("Teléfono: ");
-        int telefono = input.nextInt();
-        input.nextLine();
-        System.out.print("Correo electrónico: ");
-        String correo = input.nextLine();
 
-        return new Cliente(nombre, apellido1, apellido2, dni, telefono, correo);
+        // Buscar cliente
     }
 
-    public String pedirDni() {
-        System.out.print("Introduce el DNI del cliente: ");
-        return input.nextLine();
+    void eliminarCliente(){
+        System.out.println("--- Eliminar un cliente: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el dni del cliente: ");
+        String dni = input.nextLine();
+
+        // Eliminar cliente
     }
 
-    // ***********************************************************
-    // HOTELES
-    // ***********************************************************
-    public void listarHoteles(List<Hotel> listaHoteles) {
-        System.out.println("--- Listado de hoteles ---");
-        for (Hotel h : listaHoteles) {
-            System.out.println(h.toString());
+    public void mostrarMenuHoteles(){
+        boolean salir = false;
+        char opcion;
+
+        do {
+            System.out.println("");
+            System.out.println("1. Listar hoteles.");
+            System.out.println("2. Añadir hoteles.");
+            System.out.println("3. Editar hoteles.");
+            System.out.println("4. Eliminar hoteles.");
+            System.out.println("0. Volver al menu principal.");
+            System.out.println("");
+
+            opcion = pedirOpcionMenus();
+
+            switch (opcion){
+                case '1':
+                    listarHoteles();
+                    break;
+                case '2':
+                    anadirHotel();
+                    break;
+                case '3':
+                    editarHotel();
+                    break;
+                case '4':
+                    eliminarHotel();
+                    break;
+                case '0':
+                    salir = true;
+            }
+
+        } while (!salir);
+    }
+
+    void listarHoteles(){
+        char opcion;
+
+        System.out.println("--- Listado de los clientes disponibles: ---");
+        System.out.println("");
+
+        System.out.println("1. Listar todos los hoteles.");
+        System.out.println("2. Listar los hoteles por ciudad.");
+        System.out.println("3. Listar hoteles por");
+
+        opcion = pedirOpcionMenus();
+
+        switch (opcion){
+            case '1':
+                listarTodosHoteles();
+                break;
+            case '2':
+                listarCiudadHoteles();
+                break;
+            case '3':
+                listar_Hoteles();
         }
+
     }
 
-    public Hotel anadirHotel() {
-        System.out.println("--- Añadir nuevo hotel ---");
-        System.out.print("Nombre del hotel: ");
-        String nombre = input.nextLine();
-        System.out.print("Dirección: ");
-        String direccion = input.nextLine();
-        System.out.print("Ciudad: ");
-        String ciudad = input.nextLine();
-        System.out.print("Teléfono: ");
-        int telefono = input.nextInt();
-        input.nextLine();
-
-        return new Hotel(nombre, direccion, ciudad, telefono);
+    void listarTodosHoteles(){
+        // Listar todos los hoteles
     }
 
-    public String pedirNombreHotel() {
+    void listarCiudadHoteles(){
+        // Listar hoteles por ciudad
+    }
+
+    void listar_Hoteles(){
+        // Listar hoteles por algo.
+    }
+
+    void anadirHotel(){
+        System.out.println("--- Añadir un nuevo hotel: ---");
+        System.out.println("");
+
         System.out.print("Introduce el nombre del hotel: ");
-        return input.nextLine();
+        String nombreHotel = input.nextLine();
+
+        System.out.print("Introduce la dirección del hotel: ");
+        String direccionHotel = input.nextLine();
+
+        System.out.print("Introduce la ciudad del hotel: ");
+        String ciudadHotel = input.nextLine();
+
+        System.out.print("Introduce el teléfono del hotel: ");
+        int telefonoHotel = input.nextInt();
+        input.nextLine();
+
+        // Crear hotel
     }
 
-    // ***********************************************************
-    // HABITACIONES
-    // ***********************************************************
-    public void listarHabitaciones(List<Habitacion> listaHabitaciones) {
-        System.out.println("--- Listado de habitaciones ---");
-        for (Habitacion hab : listaHabitaciones) {
-            System.out.println("Habitación " + hab.getNumHabitacion() + " - Categoría: " + hab.getCategoria() + " - Precio: " + hab.getPrecioNoche());
+    void editarHotel(){
+        System.out.println("--- Editar un hotel: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el nombre del hotel: ");
+        String nombreHotel = input.nextLine();
+
+        // Editar hotel
+    }
+
+    void eliminarHotel(){
+        System.out.println("--- Eliminar un hotel: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el nombre del hotel: ");
+        String dni = input.nextLine();
+
+        // Eliminar hotel
+    }
+
+    public void mostrarMenuHabitaciones(){
+        boolean salir = false;
+        char opcion;
+
+        do {
+            System.out.println("");
+            System.out.println("1. Listar habitaciones.");
+            System.out.println("2. Añadir habitaciones.");
+            System.out.println("3. Editar habitaciones.");
+            System.out.println("4. Eliminar habitaciones.");
+            System.out.println("0. Volver al menu principal.");
+            System.out.println("");
+
+            opcion = pedirOpcionMenus();
+
+            switch (opcion){
+                case '1':
+                    listarHabitaciones();
+                    break;
+                case '2':
+                    anadirHabitacion();
+                    break;
+                case '3':
+                    editarHabitacion();
+                    break;
+                case '4':
+                    eliminarHabitacion();
+                    break;
+                case '0':
+                    salir = true;
+            }
+
+        } while (!salir);
+    }
+
+    void listarHabitaciones(){
+        System.out.println("--- Listar una habitación: ---");
+        System.out.println("");
+
+        System.out.print("Selecciona de que hotel quieres listar las habitaciones: ");
+        String nombreHotel = input.nextLine();
+
+        // Buscar hotel y nombre
+
+        System.out.println("");
+        System.out.println("1. Simple");
+        System.out.println("2. Doble");
+        System.out.println("3. Suite");
+        System.out.println("");
+
+        System.out.print("Introduce el tipo de habitación que quieres listar dentro de este hotel: ");
+        int tipoHabitacion = input.nextInt();
+        input.nextLine();
+
+        switch (tipoHabitacion){
+            case '1':
+                // Listar habitaciones simples.
+                break;
+            case '2':
+                // Listar habitaciones dobles.
+                break;
+            case '3':
+                // Listar habitaciones suite.
+                break;
         }
     }
 
-    public Habitacion anadirHabitacion() {
-        System.out.println("--- Añadir nueva habitación ---");
-        System.out.print("Tipo (1. Simple | 2. Doble | 3. Suite): ");
-        int tipo = input.nextInt();
+    void anadirHabitacion(){
+        System.out.println("--- Añadir una nueva habitación: ---");
+        System.out.println("");
+
+        System.out.print("Selecciona el hotel en el que añadir la habitación: ");
+        String nombreHotel = input.nextLine();
+
+        // Buscar hotel
+
+        System.out.print("Introduce el tipo de habitación que quieres crear: ");
+        int tipoHabitacion = input.nextInt();
         input.nextLine();
 
-        System.out.print("Número de habitación: ");
-        int num = input.nextInt();
+        System.out.print("Introduce el número de habitación: ");
+        int numHabitacionHabitacion = input.nextInt();
         input.nextLine();
 
-        System.out.print("Capacidad máxima: ");
-        int capacidad = input.nextInt();
+        System.out.print("Introduce la capacidad de la habitación: ");
+        int numCapacidadHabitacion = input.nextInt();
         input.nextLine();
 
-        System.out.print("Precio por noche: ");
-        double precio = input.nextDouble();
+        System.out.print("Introduce el precio de cada noche de la habitación: ");
+        double precioNocheHabitacion = input.nextDouble();
         input.nextLine();
 
-        switch (tipo) {
-            case 1:
-                System.out.print("Medida de la cama (ej. 135x190): ");
-                String medidaCama = input.nextLine();
-                System.out.print("¿Tiene escritorio? (true/false): ");
-                boolean escritorio = input.nextBoolean();
-                input.nextLine();
-                return new Simple(num, capacidad, precio, "Simple", medidaCama, escritorio);
+        System.out.print("Introduce si esta disponible la habitación: (Si = TRUE | No = FALSE): ");
+        boolean disponibleHabitacion = input.nextBoolean();
+        input.nextLine();
 
-            case 2:
-                System.out.print("Tipo de cama doble: ");
-                String tipoCamaDoble = input.nextLine();
-                System.out.print("¿Admite supletoria? (true/false): ");
-                boolean supletoria = input.nextBoolean();
-                input.nextLine();
-                System.out.print("Suplemento por supletoria: ");
-                double suplemento = input.nextDouble();
-                input.nextLine();
-                System.out.print("¿Tiene balcón? (true/false): ");
-                boolean balcon = input.nextBoolean();
-                input.nextLine();
-                return new Doble(num, capacidad, precio, tipoCamaDoble, supletoria, suplemento, balcon);
+        System.out.print("");
+        System.out.print("1. Simple");
+        System.out.print("2. Doble");
+        System.out.print("3. Suite");
+        System.out.print("");
 
-            case 3:
-                System.out.print("Número de ambientes: ");
-                int ambientes = input.nextInt();
-                input.nextLine();
-                System.out.print("¿Tiene jacuzzi? (true/false): ");
-                boolean jacuzzi = input.nextBoolean();
-                input.nextLine();
-                System.out.print("¿Incluye spa? (true/false): ");
-                boolean spa = input.nextBoolean();
-                input.nextLine();
-                System.out.print("¿Incluye terraza? (true/false): ");
-                boolean terraza = input.nextBoolean();
-                input.nextLine();
-                System.out.print("Otros servicios extra: ");
-                String otrosServicios = input.nextLine();
-                return new Suite(num, capacidad, precio, "Suite", ambientes, jacuzzi, spa, terraza, otrosServicios);
+        System.out.print("Introduce la categoría de la habitación: ");
+        int respuestaCategoriaHabitacion = input.nextInt();
+        input.nextLine();
 
-            default:
-                System.out.println("Tipo no válido. Retornando null.");
-                return null;
-        }
-    }
+        String categoriaHabitacion;
+        if (respuestaCategoriaHabitacion == 1){
+            categoriaHabitacion = "Simple";
 
-    // ***********************************************************
-    // RESERVAS
-    // ***********************************************************
-    public void listarReservas(List<Reserva> listaReservas) {
-        System.out.println("--- Listado de reservas ---");
-        for (Reserva r : listaReservas) {
-            System.out.println(r.toString());
-        }
-    }
-
-    public Reserva anadirReserva() {
-        try {
-            System.out.println("--- Crear nueva reserva ---");
-            System.out.print("ID de la reserva: ");
-            int id = input.nextInt();
+            System.out.print("Introduce la medida de la cama: ");
+            int medidaCamaSimple = input.nextInt();
             input.nextLine();
 
-            System.out.print("DNI del cliente: ");
-            String dniCliente = input.nextLine();
-
-            System.out.print("Nombre del hotel: ");
-            String nombreHotel = input.nextLine();
-
-            System.out.print("Número de la habitación: ");
-            int numHabitacion = input.nextInt();
+            System.out.print("Introduce si la habitación tiene escritorio: (Si = TRUE | No = FALSE): ");
+            boolean escritorioHabitacion = input.nextBoolean();
             input.nextLine();
 
-            System.out.print("Fecha de entrada (yyyy-MM-dd): ");
-            Date fechaEntrada = dateFormat.parse(input.nextLine());
+            // Crear habitación simple
 
-            System.out.print("Fecha de salida (yyyy-MM-dd): ");
-            Date fechaSalida = dateFormat.parse(input.nextLine());
+        } else if (respuestaCategoriaHabitacion == 2){
+            categoriaHabitacion = "Doble";
 
-            System.out.print("Número de huéspedes: ");
-            int huespedes = input.nextInt();
+            System.out.print("Introduce el tipo de cama: ");
+            String tipoCamaDoble = input.nextLine();
+
+            System.out.print("Introduce si la habitación tiene supletoria: (Si = TRUE | No = FALSE): ");
+            boolean supletoriaHabitacion = input.nextBoolean();
             input.nextLine();
 
-            // Importe total inicial a 0.0 (el Controlador usará la clase Datos para calcular el precio real)
-            return new Reserva(id, new Date(), fechaEntrada, fechaSalida, huespedes, 0.0, true, nombreHotel, numHabitacion, dniCliente);
+            System.out.print("Introduce si la habitación tiene supletoria: (Si = TRUE | No = FALSE): ");
+            double costeSupletoriaHabitacion = input.nextDouble();
+            input.nextLine();
 
-        } catch (ParseException e) {
-            System.out.println("Error de formato en las fechas. Se aborta la creación.");
-            return null;
+            System.out.print("Introduce si la habitación tiene balcon: (Si = TRUE | No = FALSE): ");
+            boolean balconHabitacion = input.nextBoolean();
+            input.nextLine();
+
+            // Crear habitación doble
+
+        } else if (respuestaCategoriaHabitacion == 3){
+            categoriaHabitacion = "Suite";
+
+            System.out.print("Introduce el número de ambientes de la habitación: ");
+            int ambientesSuite = input.nextInt();
+            input.nextLine();
+
+            System.out.print("Introduce si la habitación tiene jacuzzi: (Si = TRUE | No = FALSE): ");
+            boolean jacuzziHabitacion = input.nextBoolean();
+            input.nextLine();
+
+            System.out.print("Introduce si la habitación tiene spa: (Si = TRUE | No = FALSE): ");
+            boolean spaHabitacion = input.nextBoolean();
+            input.nextLine();
+
+            System.out.print("Introduce si la habitación tiene terraza: (Si = TRUE | No = FALSE): ");
+            boolean terrazaHabitacion = input.nextBoolean();
+            input.nextLine();
+
+            System.out.print("Introduce que tipos de servicio extra tiene: ");
+            String serviciosExtra = input.nextLine();
+
+            // Crear habitación Suite
+
+        } else {
+            System.out.print("Error al crear la habitación.");
         }
+
     }
 
-    // ***********************************************************
-    // UTILIDADES GLOBALES
-    // ***********************************************************
-    public void mostrarMensaje(String mensaje) {
-        System.out.println(mensaje);
+    void editarHabitacion(){
+        System.out.println("--- Editar una habitación: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el nombre del hotel del cual quieres editar la habitación:");
+        String nombreHotel = input.nextLine();
+
+        // Editar una habitación
     }
 
-    private char pedirOpcionMenus() {
+    void eliminarHabitacion(){
+        System.out.println("--- Eliminar una habitación: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el nombre del hotel del cual quieres eliminar la habitación:");
+        String nombreHotel = input.nextLine();
+
+        // Eliminar la habitación
+    }
+
+    public void mostrarMenuReservas(){
+        boolean salir = false;
+        char opcion;
+
+        do {
+            System.out.println("");
+            System.out.println("1. Listar reservas.");
+            System.out.println("2. Añadir reservas.");
+            System.out.println("3. Editar reservas.");
+            System.out.println("4. Eliminar reservas.");
+            System.out.println("0. Volver al menu principal.");
+            System.out.println("");
+
+            opcion = pedirOpcionMenus();
+
+            switch (opcion){
+                case '1':
+                    listarReservas();
+                    break;
+                case '2':
+                    anadirReserva();
+                    break;
+                case '3':
+                    editarReserva();
+                    break;
+                case '4':
+                    eliminarReserva();
+                    break;
+                case '0':
+                    salir = true;
+            }
+
+        } while (!salir);
+    }
+
+    void listarReservas(){
+        System.out.println("--- Listar una reserva: ---");
+        System.out.println("");
+
+        System.out.print("Introduce el id de la reserva: ");
+        int idReserva = input.nextInt();
+        input.nextLine();
+
+        // Listar reservas
+    }
+
+    void anadirReserva(){
+        System.out.println("--- Crear una reserva ---");
+        System.out.println("");
+
+        System.out.print("Introduce el id de la reserva: ");
+        int idReserva = input.nextInt();
+        input.nextLine();
+
+        LocalDate fehcaReserva = LocalDate.now();
+
+        System.out.print("Introduce la fecha de inicio de la reserva (AAAA-MM-DD): ");
+        LocalDate fechaEntradaReserva = LocalDate.parse(input.next());
+        input.nextLine();
+
+        System.out.print("Introduce la fecha de salida de la reserva (AAAA-MM-DD): ");
+        LocalDate fechaSalidaReserva = LocalDate.parse(input.next());
+        input.nextLine();
+
+        System.out.print("Introduce el número de huespedes: ");
+        int numHuespedesReserva = input.nextInt();
+        input.nextLine();
+
+        // Calcular el precio total
+
+        System.out.print("Introduce si la reserva esta activa: (Si = TRUE | No = FALSE): ");
+        boolean activaReserva = input.nextBoolean();
+        input.nextLine();
+
+        System.out.print("Introduce el nombre del hotel: ");
+        String nombreHotel = input.nextLine();
+
+        System.out.print("Introduce el número de la habitación: ");
+        int numHabitacionReserva = input.nextInt();
+        input.nextLine();
+
+        System.out.print("Introduce el dni del cliente: ");
+        String dniCliente = input.nextLine();
+
+        // Crear reserva
+    }
+
+    void editarReserva(){
+        System.out.println("--- Editar una reserva ---");
+        System.out.println("");
+
+        System.out.print("Introduce el id de la reserva: ");
+        int idReserva = input.nextInt();
+        input.nextLine();
+
+        // Editar reserva
+    }
+
+    void eliminarReserva(){
+        System.out.println("--- Elimianr una reserva ---");
+        System.out.println("");
+
+        System.out.print("Introduce el id de la reserva: ");
+        int idReserva = input.nextInt();
+        input.nextLine();
+
+        // Eliminar reserva
+    }
+
+    char pedirOpcionMenus(){
+        String respuesta;
         System.out.print("Elige una opción: ");
-        String respuesta = input.nextLine();
-        return respuesta.isEmpty() ? ' ' : respuesta.charAt(0);
+        respuesta = input.nextLine();
+        if (respuesta.isEmpty()){
+            respuesta = " ";
+        }
+        return respuesta.charAt(0);
     }
 }

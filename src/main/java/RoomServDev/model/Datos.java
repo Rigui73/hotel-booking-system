@@ -121,6 +121,34 @@ public class Datos {
         clientes.remove(dni);
     }
 
+    //7.- CAMBIA EL DNI DE UN CLIENTE
+
+    public void cambiarDniCliente(String dniActual, String dniNuevo) throws ClienteDuplicadoException {
+        Cliente cliente = clientes.get(dniActual);
+
+        // si el cliente no existe o el DNI es el mismo, no hay nada que cambiar
+        if (cliente == null || dniActual.equals(dniNuevo)) {
+            return;
+        }
+
+        // el nuevo DNI no puede pertenecer a otro cliente
+        if (clientes.containsKey(dniNuevo)) {
+            throw new ClienteDuplicadoException("El cliente con DNI " + dniNuevo + " ya está registrado");
+        }
+
+        // el DNI es la clave del Map: hay que sacar al cliente y volver a meterlo con la nueva clave
+        clientes.remove(dniActual);
+        cliente.setDni(dniNuevo);
+        clientes.put(dniNuevo, cliente);
+
+        // las reservas guardan el DNI del cliente, así que también hay que actualizarlas
+        for (Reserva reserva : reservas) {
+            if (reserva.getDniCliente().equalsIgnoreCase(dniActual)) {
+                reserva.setDniCliente(dniNuevo);
+            }
+        }
+    }
+
 
     // ********************************************* Métodos para la gestión de hoteles  *********************************************
 
@@ -152,7 +180,7 @@ public class Datos {
     //4.- MOSTRAR HABITACIONES DE UNA DETERMINADA CATEGORIA
 
     public List<Habitacion> mostrarHabitacionesPorCategoria(String categoria) {
-        List<Habitacion> habitacionesFiltradas = new ArrayList();
+        List<Habitacion> habitacionesFiltradas = new ArrayList<>();
 
         for (Hotel hotel : hoteles) {
             for (Habitacion habitacion : hotel.getHabitaciones()) {
@@ -204,14 +232,16 @@ public class Datos {
                     // la reserva es para la habitacion seleccionada del hotel seleccionado?
                     //incluimos aqui getNumHabitacion() y getNombre en Reserva
 
-                    if (reserva.getNombreHotel().equalsIgnoreCase(hotel.getNombre()) &&
+                    if (reserva.isEstado() &&
+                            reserva.getNombreHotel().equalsIgnoreCase(hotel.getNombre()) &&
                             reserva.getNumHabitacion() == habitacion.getNumHabitacion()) {
+
                         //Validación de fechas
                         if (fechaEntradaSolicitada.before(reserva.getFechaSalida()) &&
                                 fechaSalidaSolicitada.after(reserva.getFechaEntrada())) {
 
                             estaDisponible = false;
-                            break;//salimos del bucle
+                            break;
                         }
                     }
                 }
