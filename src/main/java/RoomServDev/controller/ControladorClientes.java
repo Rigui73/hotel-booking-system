@@ -4,15 +4,18 @@ import RoomServDev.model.Cliente;
 import RoomServDev.model.ClienteConReservaException;
 import RoomServDev.model.ClienteDuplicadoException;
 import RoomServDev.model.Datos;
+import RoomServDev.view.VistaCliente;
 
 import java.util.List;
 
 public class ControladorClientes {
 
     // Los datos se guardan en Datos (modelo); el controlador valida y hace de puente con la vista
+    private final VistaCliente vista;
     private final Datos datos;
 
-    public ControladorClientes(Datos datos) {
+    public ControladorClientes(VistaCliente vista, Datos datos) {
+        this.vista = vista;
         this.datos = datos;
     }
 
@@ -51,22 +54,15 @@ public class ControladorClientes {
         }
         validarDatos(nombre, apellido1, nuevoDni, telefono, email);
 
-        // Comprobar que el nuevo DNI no es de otro cliente ANTES de cambiar nada
-        String dniLimpio = nuevoDni.trim().toUpperCase();
-        Cliente otro = buscarCliente(dniLimpio);
-        if (otro != null && otro != cliente) {
-            throw new ClienteDuplicadoException("El cliente con DNI " + dniLimpio + " ya está registrado");
-        }
+        String dniAntiguo = cliente.getDni();
 
-        // Datos se encarga de cambiar la clave del Map y de actualizar las reservas
-        datos.cambiarDniCliente(cliente.getDni(), dniLimpio);
 
         cliente.setNombre(nombre.trim());
         cliente.setApellido1(apellido1.trim());
         cliente.setApellido2(apellido2.trim());
         cliente.setTelefono(telefono);
         cliente.setEmail(email.trim());
-        datos.modificarCliente(cliente);
+        datos.modificarClienteConDni(dniAntiguo, nuevoDni, cliente);
     }
 
     // ********* Eliminar *********
@@ -107,4 +103,110 @@ public class ControladorClientes {
     private boolean estaVacio(String texto) {
         return texto == null || texto.isBlank();
     }
-}
+
+    public void gestionarMenu() {
+        int opcion;
+        do {
+            opcion = vista.mostrarMenu();
+            switch (opcion) {
+                case 1 -> registrarClienteDesdeVista();
+                case 2 -> consultarClientePorDni();
+                case 3 -> listarTodos();
+                case 4 -> modificarClienteDesdeVista();
+                case 5 -> borrarClienteDesdeVista();
+                case 0 -> vista.mostrarMensaje("Volviendo al menú principal...");
+                default -> vista.mostrarError("Opción no válida. Introduzca un número del 0 al 5.");
+            }
+        } while (opcion != 0);
+    }
+
+    private void registrarClienteDesdeVista() {
+        try {
+            String dni = vista.pedirDNI();
+            String nombre = vista.pedirNombre();
+            String apellido1 = vista.pedirApellido1();
+            String apellido2 = vista.pedirApellido2();
+
+            int telefono;
+            try {
+                telefono = Integer.parseInt(vista.pedirTelefono());
+            } catch (NumberFormatException e) {
+                vista.mostrarError("El teléfono debe contener únicamente números.");
+                return;
+            }
+
+            String email = vista.pedirEmail();
+
+            crearCliente(nombre, apellido1, apellido2, dni, telefono, email);
+            vista.mostrarMensaje("Cliente registrado con éxito.");
+        } catch (ClienteDuplicadoException | IllegalArgumentException e) {
+            vista.mostrarError(e.getMessage());
+        }
+    }
+
+    private void consultarClientePorDni() {
+        String dni = vista.pedirDNI();
+        Cliente c = buscarCliente(dni);
+        if (c != null) {
+            String ap2 = (c.getApellido2() == null || c.getApellido2().isBlank()) ? "" : " " + c.getApellido2();
+            vista.mostrarDetalleCliente(
+                    c.getDni(),
+                    c.getNombre() + " " + c.getApellido1() + ap2,
+                    String.valueOf(c.getTelefono()),
+                    c.getEmail()
+            );
+        } else {
+            vista.mostrarError("No se encontró ningún cliente con DNI " + dni);
+        }
+    }
+
+    private void listarTodos() {
+        List<Cliente> lista = listarClientes();
+        vista.mostrarListaClientes(lista);
+    }
+
+    private void modificarClienteDesdeVista() {
+        String dniActual = vista.pedirDNI();
+        Cliente c = buscarCliente(dniActual);
+
+        if (c == null) {
+            vista.mostrarError("No existe ningún cliente registrado con DNI " + dniActual);
+            return;
+        }
+
+        vista.mostrarMensaje("Introduzca los nuevos datos para el cliente (DNI actual: " + dniActual + "):");
+        try {
+            String nuevoDni = vista.pedirDNI();
+            String nombre = vista.pedirNombre();
+            String apellido1 = vista.pedirApellido1();
+            String apellido2 = vista.pedirApellido2();
+
+            int telefono;
+            try {
+                telefono = Integer.parseInt(vista.pedirTelefono());
+            } catch (NumberFormatException e) {
+                vista.mostrarError("El teléfono debe contener únicamente números.");
+                return;
+            }
+
+            String email = vista.pedirEmail();
+
+            editarCliente(dniActual, nuevoDni, nombre, apellido1, apellido2, telefono, email);
+            vista.mostrarMensaje("Cliente modificado correctamente.");
+        } catch (ClienteDuplicadoException | IllegalArgumentException e) {
+            vista.mostrarError(e.getMessage());
+        }
+    }
+
+    private void borrarClienteDesdeVista() {
+        String dni = vista.pedirDNI();
+        try {
+            eliminarCliente(dni);
+            vista.mostrarMensaje("Cliente con DNI " + dni + " eliminado satisfactoriamente.");
+        } catch (ClienteConReservaException | IllegalArgumentException e) {
+            vista.mostrarError(e.getMessage());
+        }
+    }
+
+    }
+

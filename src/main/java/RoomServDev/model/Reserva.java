@@ -20,9 +20,7 @@ public class Reserva {
 
     // ********* Constructor  *********
 
-    public Reserva(int idReserva, Date fechaReserva, Date fechaEntrada,
-                   Date fechaSalida, int numHuespedes, double importeTotal, boolean estado,
-                   String nombreHotel, int numHabitacion, String dniCliente){
+    public Reserva(){
 
         this.idReserva = idReserva;
         this.fechaReserva = fechaReserva;
@@ -35,6 +33,8 @@ public class Reserva {
         this.numHabitacion = numHabitacion;
         this.dniCliente = dniCliente;
         }
+
+
 
     // *********GETTERS y SETTERS*********
 

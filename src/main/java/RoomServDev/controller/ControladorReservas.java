@@ -53,16 +53,6 @@ public class ControladorReservas {
         comprobarSolapamiento(hotel.getNombre(), numHabitacion, entrada, salida, null);
 
         Reserva reserva = new Reserva(
-                generarId(),
-                aDate(LocalDate.now()),
-                aDate(entrada),
-                aDate(salida),
-                numHuespedes,
-                calcularImporte(habitacion, entrada, salida),
-                true,
-                hotel.getNombre(),
-                numHabitacion,
-                cliente.getDni()
         );
         datos.anadirReservas(reserva);
         return reserva;

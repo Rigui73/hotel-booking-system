@@ -16,8 +16,7 @@ public class Hotel {
 
 // ********* Constructor  *********
 
-    public Hotel(String nombre, String direccion,
-                 String ciudad, int telefono){
+    public Hotel(){
         this.nombre = nombre;
         this.direccion = direccion;
         this.ciudad = ciudad;
@@ -82,4 +81,5 @@ public class Hotel {
                 ",telefono=" + telefono +
                 '}';
     }
+
 }

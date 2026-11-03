@@ -17,7 +17,7 @@ public class Doble extends Habitacion {
                  String tipoCamaDoble, boolean supletoria, double suplementSupletoria, boolean balcon) {
         //*********invocamos constructor de la clase padre*********
 
-        super(numHabitacion, capacidadMax, precioNoche, true, "Doble");
+        super();
 
         // *********inicializamos los atributos propios de la subclase*********
         this.tipoCamaDoble = tipoCamaDoble;

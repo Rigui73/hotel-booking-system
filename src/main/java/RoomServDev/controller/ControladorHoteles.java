@@ -21,7 +21,7 @@ public class ControladorHoteles {
     public void crearHotel(String nombre, String direccion, String ciudad, int telefono)
             throws HotelDuplicadoException {
         validarDatos(nombre, direccion, ciudad, telefono);
-        datos.anadirHotel(new Hotel(nombre.trim(), direccion.trim(), ciudad.trim(), telefono));
+        datos.anadirHotel(new Hotel());
     }
 
     // ********* Consultar *********

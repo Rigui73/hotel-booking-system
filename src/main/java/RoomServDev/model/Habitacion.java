@@ -13,13 +13,14 @@ public class Habitacion{
 
     //constructor
 
-    public Habitacion(int numHabitacion, int capacidad, double precioNoche, boolean disponible, String categoria) {
+    public Habitacion() {
         this.numHabitacion = numHabitacion;
         this.capacidad = capacidad;
         this.precioNoche = precioNoche;
         this.categoria = categoria;
         this.disponible = disponible;
     }
+
 
     // --------GETTERS y SETTERS ---------
 

@@ -20,10 +20,6 @@ public class Main_2 {
 
         // Crear hotel
         Hotel hotel = new Hotel(
-                "Hotel Costa Brava",
-                "Carrer Major, 15",
-                "Roses",
-                972123456
         );
 
         // Crear habitaciones
@@ -96,30 +92,10 @@ public class Main_2 {
 
         // Crear una reserva para la habitación doble
         Reserva reservaDoble = new Reserva(
-                1001,
-                fechaReserva,
-                fechaEntrada,
-                fechaSalida,
-                3,
-                3 * habitacionDoble.getPrecioNoche(),
-                true,
-                "Hotel Costa Brava",
-                habitacionDoble.getNumHabitacion(),
-                cliente.getDni()
         );
 
         // Crear una reserva para la habitación simple
         Reserva reservaSimple = new Reserva(
-                1002,
-                fechaReserva,
-                fechaEntrada,
-                fechaSalida,
-                1,
-                3 * habitacionSimple.getPrecioNoche(),
-                true,
-                "Hotel Costa Brava",
-                habitacionSimple.getNumHabitacion(),
-                cliente.getDni()
         );
 
         // Mostrar la reserva de la habitación doble
