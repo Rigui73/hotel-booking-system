@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 import RoomServDev.controller.ControladorClientes;
 import RoomServDev.model.*;
+import RoomServDev.model.dao.ClienteDAO;
+import RoomServDev.model.dao.ClienteDAOImpl;
 import RoomServDev.view.VistaCliente;
 import RoomServDev.view.vistaMenus;
 
@@ -25,9 +27,14 @@ public class Main {
         // 2. Precargamos los datos iniciales de prueba en el modelo
         cargarDatosPrueba(datos);
 
+        // Creamos objeto que implementa la interfaz
+
+        ClienteDAO miClienteDAO = new ClienteDAOImpl();
+
         // 3. Instanciamos vistas y controladores
+
         VistaCliente vistaCliente = new VistaCliente(input);
-        ControladorClientes controladorClientes = new ControladorClientes(vistaCliente, datos);
+        ControladorClientes controladorClientes = new ControladorClientes(vistaCliente, miClienteDAO);
 
         // Vista de menús provisional para el resto de módulos aún no migrados
         vistaMenus vistaGeneral = new vistaMenus(input);
