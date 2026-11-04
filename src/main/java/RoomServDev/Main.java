@@ -43,7 +43,7 @@ public class Main {
 
         do {
             System.out.println("\n========================================================");
-            System.out.println(" GESTOR DE RESERVAS DE HOTELES - By: ROOM SERVICE DEV");
+            System.out.println("GESTOR DE RESERVAS DE HOTELES - By: ROOM SERVICE DEV");
             System.out.println("========================================================");
             System.out.println("1. Clientes");
             System.out.println("2. Hoteles");
@@ -101,9 +101,10 @@ public class Main {
             hotel.setDireccion("Gran Via 123");
             hotel.setTelefono(933001122);
 
-            Simple habSimple = new Simple(101, 1, 75.00, "Individual", "90x200", true);
-            Doble habDoble = new Doble(201, 3, 120.00, "Matrimonio", true, 25.00, true);
+            Simple habSimple = new Simple(101, 1, 75.00, "Simple", "90x200", true);
+            Doble habDoble = new Doble(201, 3, 120.00, 2, "Doble", "Matrimonio", true, 25.00, true);
             Suite suite = new Suite(301, 4, 220.00, "Suite", 2, true, true, true, "Minibar y terraza");
+
 
             hotel.getHabitaciones().add(habSimple);
             hotel.getHabitaciones().add(habDoble);

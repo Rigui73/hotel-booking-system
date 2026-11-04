@@ -40,8 +40,8 @@ public class ControladorHabitaciones {
         }
         if (!supletoria) suplementoSupletoria = 0;
 
-        Doble doble = new Doble(numHabitacion, capacidad, precioNoche, tipoCama,
-                supletoria, suplementoSupletoria, balcon);
+        Doble doble = new Doble(numHabitacion, capacidad, precioNoche, capacidad, "Doble",
+                tipoCama, supletoria, suplementoSupletoria, balcon);
         doble.setDisponible(disponible);
         hotel.anadirHabitacion(doble);
     }

@@ -6,7 +6,6 @@ public class MySQLDAOFactory extends DAOFactory {
         return new ClienteDAOImpl();
     }
 
-    /* TODO
 
     @Override
     public HotelDAO getHotelDAO() {
@@ -22,6 +21,4 @@ public class MySQLDAOFactory extends DAOFactory {
     public ReservaDAO getReservaDAO() {
         return new ReservaDAOImpl();
     }
-
-    */
 }

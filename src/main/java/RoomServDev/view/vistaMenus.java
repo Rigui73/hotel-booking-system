@@ -1,11 +1,7 @@
 package RoomServDev.view;
 
-import RoomServDev.model.Cliente;
-import RoomServDev.model.Habitacion;
-import RoomServDev.model.Hotel;
-import RoomServDev.model.Reserva;
+import RoomServDev.model.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -204,16 +200,38 @@ public class vistaMenus {
         System.out.println("--- Listar habitaciones: ---");
     }
 
+    public int pedirNumHabitacion() {
+        System.out.print("Introduce el número de habitación: ");
+        while (!input.hasNextInt()) {
+            System.out.println("Entrada inválida. Debe introducir un número entero.");
+            input.next();
+            System.out.print("Introduce el número de habitación: ");
+        }
+        int num = input.nextInt();
+        input.nextLine(); // Limpiar el buffer
+        return num;
+    }
+
+    public double pedirPrecio() {
+        System.out.print("Introduce el precio por noche: ");
+        while (!input.hasNextDouble()) {
+            System.out.println("Entrada inválida. Debe introducir un importe numérico.");
+            input.next();
+            System.out.print("Introduce el precio por noche: ");
+        }
+        double precio = input.nextDouble();
+        input.nextLine(); // Limpiar el buffer
+        return precio;
+    }
+
     public Habitacion anadirHabitacion() {
         System.out.println("\n--- Añadir una nueva habitación: ---");
-        System.out.print("Introduce el número de habitación: ");
-        int num = Integer.parseInt(input.nextLine().trim());
+        int num = pedirNumHabitacion();
 
         System.out.print("Introduce la capacidad: ");
         int cap = Integer.parseInt(input.nextLine().trim());
 
-        System.out.print("Introduce el precio por noche: ");
-        double precio = Double.parseDouble(input.nextLine().trim());
+        double precio = pedirPrecio();
 
         System.out.print("¿Está disponible? (true/false): ");
         boolean disp = Boolean.parseBoolean(input.nextLine().trim());
@@ -221,12 +239,16 @@ public class vistaMenus {
         System.out.print("Introduce la categoría (Simple, Doble, Suite): ");
         String cat = input.nextLine().trim();
 
-        Habitacion hab = new Habitacion();
-        hab.setNumHabitacion(num);
-        hab.setCapacidad(cap);
-        hab.setPrecioNoche(precio);
+        Habitacion hab;
+        if ("Doble".equalsIgnoreCase(cat)) {
+            hab = new Doble(num, cap, precio, cap, "Doble", "Matrimonio", true, 25.0, disp);
+        } else if ("Suite".equalsIgnoreCase(cat)) {
+            hab = new Suite(num, cap, precio, "Suite", 2, true, true, true, "Servicio completo");
+        } else {
+            hab = new Simple(num, cap, precio, "Simple", "90x200", true);
+        }
+
         hab.setDisponible(disp);
-        hab.setCategoria(cat);
         return hab;
     }
 

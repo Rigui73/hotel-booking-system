@@ -3,19 +3,17 @@ package RoomServDev.controller;
 import RoomServDev.model.Cliente;
 import RoomServDev.model.ClienteConReservaException;
 import RoomServDev.model.ClienteDuplicadoException;
-import RoomServDev.model.Datos;
 import RoomServDev.view.VistaCliente;
 import RoomServDev.model.dao.ClienteDAO;
 
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Locale;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 public class ControladorClientes {
 
-    // Los datos se guardan en Datos (modelo); el controlador valida y hace de puente con la vista
+    // atributos
     private final VistaCliente vista;
     private final ClienteDAO clienteDAO;
 
@@ -38,7 +36,6 @@ public class ControladorClientes {
             throw new ClienteDuplicadoException("El DNI " + dni + " ya existe en el sistema");
         } catch (java.sql.SQLException e) {
             System.err.println("Error al insertar el cliente: " + e.getMessage());
-            throw e;
         }
     }
 
@@ -75,17 +72,7 @@ public class ControladorClientes {
             throw new ClienteDuplicadoException("El nuevo DNI " + nuevoDni + " ya existe en el sistema");
         }
     }
-/* PARA BORRAR
 
-        cliente.setNombre(nombre.trim());
-        cliente.setApellido1(apellido1.trim());
-        cliente.setApellido2(apellido2.trim());
-        cliente.setTelefono(telefono);
-        cliente.setEmail(email.trim());
-        datos.modificarClienteConDni(dniAntiguo, nuevoDni, cliente);
-    }
-
-*/
     // ********* Eliminar *********
 
     public void eliminarCliente(String dni) throws Exception {

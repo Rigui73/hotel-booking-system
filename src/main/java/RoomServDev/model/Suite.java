@@ -18,7 +18,7 @@ public class Suite extends Habitacion{
 
         //*********Invocamos constructor padre*********
 
-        super();
+        super(numHabitacion, capacidad, precioNoche, categoria, true);
 
         this.numAmbientes = numAmbientes;
         this.jacuzzi = jacuzzi;

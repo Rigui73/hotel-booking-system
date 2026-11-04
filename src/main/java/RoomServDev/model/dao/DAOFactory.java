@@ -5,11 +5,10 @@ public abstract class DAOFactory {
     public static final int MYSQL = 1;
 
     public abstract ClienteDAO getClienteDAO();
-    /* TODO
     public abstract HotelDAO getHotelDAO();
     public abstract HabitacionDAO getHabitacionDAO();
     public abstract ReservaDAO getReservaDAO();
-    */
+
     public static DAOFactory getDAOFactory(int tipo){
         switch (tipo){
             case MYSQL:

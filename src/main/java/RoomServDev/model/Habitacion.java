@@ -8,18 +8,20 @@ public class Habitacion{
     private int numHabitacion;
     private int capacidad;
     private double precioNoche;
-    private boolean disponible;
     private String categoria;
+    private boolean disponible;
 
     //constructor
 
-    public Habitacion() {
+    public Habitacion(int numHabitacion, int capacidad, double precioNoche, String categoria, boolean disponible) {
+
         this.numHabitacion = numHabitacion;
         this.capacidad = capacidad;
         this.precioNoche = precioNoche;
         this.categoria = categoria;
         this.disponible = disponible;
     }
+
 
 
     // --------GETTERS y SETTERS ---------

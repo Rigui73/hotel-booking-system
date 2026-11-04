@@ -52,15 +52,15 @@ DROP TABLE IF EXISTS `habitaciones`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `habitaciones` (
-  `id_habitacion` int NOT NULL AUTO_INCREMENT,
-  `num_habitacion` int NOT NULL,
-  `capacidad` int NOT NULL,
-  `precio_noche` decimal(10,2) NOT NULL,
-  `disponible` tinyint(1) NOT NULL,
-  `categoria` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_hotel` int NOT NULL,
-  PRIMARY KEY (`id_habitacion`),
-  CONSTRAINT `fk_habitaciones_hoteles` FOREIGN KEY (`id_habitacion`) REFERENCES `hoteles` (`id_hotel`) ON DELETE RESTRICT ON UPDATE CASCADE
+    id_habitacion INT AUTO_INCREMENT PRIMARY KEY,
+    num_habitacion INT NOT NULL,
+    capacidad INT NOT NULL,
+    precio_noche DECIMAL(8, 2) NOT NULL,
+    disponible BOOLEAN NOT NULL DEFAULT TRUE,
+    categoria VARCHAR(20) NOT NULL,
+    id_hotel INT NOT NULL,
+    CONSTRAINT fk_habitaciones_hoteles
+        FOREIGN KEY (id_hotel) REFERENCES hoteles (id_hotel) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

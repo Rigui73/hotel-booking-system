@@ -13,11 +13,11 @@ public class Doble extends Habitacion {
 
     //*********Constructor*********
 
-    public Doble(int numHabitacion, int capacidadMax, double precioNoche,
+    public Doble(int numHabitacion, int capacidadMax, double precioNoche, int capacidad, String categoria,
                  String tipoCamaDoble, boolean supletoria, double suplementSupletoria, boolean balcon) {
         //*********invocamos constructor de la clase padre*********
 
-        super();
+        super(numHabitacion,capacidad,precioNoche,categoria,true);
 
         // *********inicializamos los atributos propios de la subclase*********
         this.tipoCamaDoble = tipoCamaDoble;

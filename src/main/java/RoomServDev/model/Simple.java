@@ -14,7 +14,7 @@ public class Simple extends Habitacion {
 
         //*********Invocamos constructor padre*********
 
-        super();
+        super(numHabitacion,capacidad,precioNoche,categoria,true);
 
         //inicializamos atributos propios
         this.medidaCama = medidaCama;
