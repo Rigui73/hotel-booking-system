@@ -2,11 +2,7 @@ package RoomServDev.model;
 
 // ********* librerias *********
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
+import java.util.*;
 
 public class Datos {
 
@@ -79,10 +75,38 @@ public class Datos {
 
     //5.- MODIFICA DATOS DE UN CLIENTE
 
-    public void modificarCliente(Cliente clienteModificado) {
-        //en un Map si hacemos "put" de un DNI ya existente, sobreescribirá los datos antiguos con el nuevo objeto
-        if (clientes.containsKey(clienteModificado.getDni())) {
-            clientes.put(clienteModificado.getDni(), clienteModificado);
+
+
+    // (Sobrecarga de 2 argumentos)
+    public void modificarClienteConDni(String dniAntiguo, Cliente clienteModificado) throws ClienteDuplicadoException {
+        // Redirige la llamada al metodo completo usando el DNI que ya tiene el objeto
+        modificarClienteConDni(dniAntiguo, clienteModificado.getDni(), clienteModificado);
+    }
+
+    public void modificarClienteConDni(String dniAntiguo, String dniNuevo, Cliente clienteModificado) throws ClienteDuplicadoException {
+        String dniLimpio = dniNuevo.trim().toUpperCase();
+
+        // si intenta cambiar el dni comprobamos que no lo tengamos ya registrado.
+
+        if (!dniAntiguo.equalsIgnoreCase(dniLimpio) && clientes.containsKey(dniLimpio)) {
+            throw new ClienteDuplicadoException("El nuevo DNI "+ dniNuevo + " ya pertenece a otro cliente registrado.");
+        }
+
+        //1. Si es válido actualizamos el DNI dentro del propio objeto
+
+        clienteModificado.setDni(dniLimpio);
+
+        //2. Hacemos el "Update" en el HashMap (borramos la llave vieja y guardamos la nueva)
+        clientes.remove(dniAntiguo);
+        clientes.put(dniLimpio, clienteModificado);
+
+        //3. Actualizamos en cascada : actualizamos la FK en todas sus reservas
+        if (!dniAntiguo.equalsIgnoreCase(dniLimpio)) {
+            for (Reserva reserva : reservas) {
+                if (reserva.getDniCliente().equalsIgnoreCase(dniAntiguo)) {
+                    reserva.setDniCliente(dniLimpio);
+                }
+            }
         }
     }
 
@@ -269,22 +293,39 @@ public class Datos {
 
     //10.- MODIFICAR HOTEL
 
-    public void modificarHotel(String nombreHotelOriginal, String nuevaDireccion, String nuevaCiudad, int nuevoTelefono) {
+    public void modificarHotelConNombre(String nombreAntiguo, Hotel hotelModificado) throws HotelDuplicadoException {
+        String nombreNuevo = hotelModificado.getNombre();
 
-        //recorremos la lista buscando el hotel por su nombre
-        for (Hotel hotel : hoteles) {
-            if (hotel.getNombre().equalsIgnoreCase(nombreHotelOriginal)) {
+        //comprobamos que el nombre no este ya pillado por otro hotel
 
-                //cuando lo encontramos, usamos los setters para actualizar sus datos
-                hotel.setDireccion(nuevaDireccion);
-                hotel.setCiudad(nuevaCiudad);
-                hotel.setTelefono(nuevoTelefono);
+        if (!nombreAntiguo.equalsIgnoreCase(nombreNuevo)) {
+            for (Hotel h : hoteles) {
+                if (h.getNombre().equalsIgnoreCase(nombreNuevo)) {
+                    throw new HotelDuplicadoException("El nombre '" + nombreNuevo + "' ya pertenece a otro hotel registrado.");
+                }
+            }
+        }
 
-                //como ya lo hemos encontrado y modificado, rompemos el bucle
+        // "Update" en el HashMap: borramos la clave vieja y guardamos el objeto con la nueva
+
+        for (int i = 0; i < hoteles.size(); i++) {
+            if (hoteles.get(i).getNombre().equalsIgnoreCase(nombreAntiguo)) {
+                hoteles.set(i, hotelModificado); // El metodo set() reemplaza el objeto en esa posición exacta
                 break;
             }
         }
+
+        // cascada: actualizamos la FK en todas las reservas asociadas a este hotel
+
+        if (!nombreAntiguo.equalsIgnoreCase(nombreNuevo)) {
+            for(Reserva reserva : reservas) {
+                if (reserva.getNombreHotel().equalsIgnoreCase(nombreAntiguo)) {
+                    reserva.setNombreHotel(nombreNuevo);
+                }
+            }
+        }
     }
+
 
     //10.- ELIMINAR HOTEL
 
@@ -383,4 +424,19 @@ public class Datos {
         //Cambiamos el estado de la reserva a false (inactiva/cancelada)
         reserva.setEstado(false);
     }
+
+    public void modificarHotel(String nombre, String trim, String trim1, int nuevoTelefono) {
+        //instanciamos entidad y pasamos datos sueltos
+        Hotel hotel = new Hotel();
+        hotel.setNombre(nombre);
+        hotel.setDireccion(trim);
+        hotel.setTelefono(Integer.parseInt(trim1));
+        hotel.setTelefono(nuevoTelefono);
+    }
+            //Pedimos DAO a la fabrica y ejecutamos
+    /*
+        DAOFactory fabrica = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        IHotelDAO hotelDAO = fabrica.getHotelDAO();
+        hotelDAO.modificar(hotel);
+            }*/
 }

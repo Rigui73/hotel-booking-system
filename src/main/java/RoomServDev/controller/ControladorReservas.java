@@ -36,50 +36,53 @@ public class ControladorReservas {
     // El id, la fecha de reserva, el estado y el importe los pone el controlador, no el usuario
     public Reserva crearReserva(String dni, String nombreHotel, int numHabitacion,
                                 LocalDate entrada, LocalDate salida, int numHuespedes)
-            throws ReservaSolapadaException {
+            throws ReservaSolapadaException, Exception {
 
         Cliente cliente = ctrlClientes.buscarCliente(dni);
         if (cliente == null) {
             throw new IllegalArgumentException("No existe ningún cliente con DNI " + dni);
         }
+
         Hotel hotel = obtenerHotel(nombreHotel);
         Habitacion habitacion = obtenerHabitacion(hotel, numHabitacion);
 
         if (!habitacion.isDisponible()) {
             throw new IllegalStateException("La habitación " + numHabitacion + " no está disponible.");
         }
+
         validarFechas(entrada, salida);
         validarHuespedes(habitacion, numHuespedes);
         comprobarSolapamiento(hotel.getNombre(), numHabitacion, entrada, salida, null);
 
+        // Cálculo del importe total: días de estancia * precio por noche
+        long diasEstancia = java.time.temporal.ChronoUnit.DAYS.between(entrada, salida);
+        if (diasEstancia <= 0) diasEstancia = 1;
+        double importeTotal = diasEstancia * habitacion.getPrecioNoche();
+
+        // Fechas en formato java.sql.Date compatibles con la entidad Reserva
+        java.sql.Date fechaHoy = java.sql.Date.valueOf(LocalDate.now());
+        java.sql.Date fEntrada = java.sql.Date.valueOf(entrada);
+        java.sql.Date fSalida = java.sql.Date.valueOf(salida);
+
+        // Instanciación con los 10 atributos de tu constructor de Reserva
+        // (idReserva=0 para que MySQL asigne el AUTO_INCREMENT al persistir)
         Reserva reserva = new Reserva(
-                generarId(),
-                aDate(LocalDate.now()),
-                aDate(entrada),
-                aDate(salida),
+                0,
+                fechaHoy,
+                fEntrada,
+                fSalida,
                 numHuespedes,
-                calcularImporte(habitacion, entrada, salida),
+                importeTotal,
                 true,
                 hotel.getNombre(),
                 numHabitacion,
                 cliente.getDni()
         );
+
+        // Registro en la colección o persistencia
         datos.anadirReservas(reserva);
+
         return reserva;
-    }
-
-    // ********* Consultar *********
-
-    public List<Reserva> listarReservas() {
-        return List.copyOf(datos.listarReservas());
-    }
-
-    public List<Reserva> listarReservasActivas() {
-        List<Reserva> resultado = new ArrayList<>();
-        for (Reserva r : datos.listarReservas()) {
-            if (r.isEstado()) resultado.add(r);
-        }
-        return resultado;
     }
 
     public List<Reserva> listarReservasCliente(String dni) {

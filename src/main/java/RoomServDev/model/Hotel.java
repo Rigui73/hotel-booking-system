@@ -7,6 +7,7 @@ public class Hotel {
 
     // ********* Atributos  *********
 
+    private int idHotel;
     private String nombre;
     private String direccion;
     private String ciudad;
@@ -16,8 +17,8 @@ public class Hotel {
 
 // ********* Constructor  *********
 
-    public Hotel(String nombre, String direccion,
-                 String ciudad, int telefono){
+    public Hotel(){
+
         this.nombre = nombre;
         this.direccion = direccion;
         this.ciudad = ciudad;
@@ -27,6 +28,14 @@ public class Hotel {
     }
 
 // *********GETTERS y SETTERS *********
+
+    public int getIdHotel() {
+        return idHotel;
+    }
+
+    public void setIdHotel(int idHotel) {
+        this.idHotel = idHotel;
+    }
 
     public String getNombre(){
         return nombre;
@@ -76,10 +85,12 @@ public class Hotel {
     @Override
         public String toString(){
         return "Hotel{" +
+                "idHotel=" + idHotel +'\'' +
                 "nombre='" + nombre + '\'' +
                 ",direccion='" + direccion + '\''+
                 ",ciudad='" + ciudad + '\'' +
                 ",telefono=" + telefono +
                 '}';
     }
+
 }

@@ -75,16 +75,6 @@ class DatosTest {
         );
 
         Reserva reserva = new Reserva(
-                1,
-                new Date(),
-                fechaEntrada,
-                fechaSalida,
-                2,
-                0.0,
-                true,
-                "Hotel Test",
-                101,
-                "12345678A"
         );
 
         double importeCalculado =
