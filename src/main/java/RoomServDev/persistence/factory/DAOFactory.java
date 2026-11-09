@@ -1,4 +1,9 @@
-package RoomServDev.model.dao;
+package RoomServDev.persistence.factory;
+
+import RoomServDev.persistence.dao.ClienteDAO;
+import RoomServDev.persistence.dao.HabitacionDAO;
+import RoomServDev.persistence.dao.HotelDAO;
+import RoomServDev.persistence.dao.ReservaDAO;
 
 public abstract class DAOFactory {
 

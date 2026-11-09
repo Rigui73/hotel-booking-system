@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Java compilado
 *.class
 
@@ -11,10 +10,16 @@ replay_pid*
 out/
 target/
 build/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.kotlin
 
 # IntelliJ IDEA: configuración local
 .idea/
 *.iml
+*.iws
+*.ipr
 
 # Archivos temporales y del sistema
 .DS_Store
@@ -23,21 +28,6 @@ Thumbs.db
 # Archivos temporales de Java/BlueJ
 .mtj.tmp/
 *.ctxt
-=======
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.kotlin
-
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
-*.iml
-*.ipr
 
 ### Eclipse ###
 .apt_generated
@@ -61,6 +51,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### Mac OS ###
-.DS_Store
->>>>>>> main
+### DB CONFIGURATION ###
+db.properties

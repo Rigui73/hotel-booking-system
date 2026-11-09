@@ -1,4 +1,4 @@
-package RoomServDev.model.dao;
+package RoomServDev.persistence.dao;
 
 import RoomServDev.model.Cliente;
 import RoomServDev.model.Doble;
@@ -7,6 +7,7 @@ import RoomServDev.model.Hotel;
 import RoomServDev.model.Reserva;
 import RoomServDev.model.Simple;
 import RoomServDev.model.Suite;
+import RoomServDev.persistence.factory.DAOFactory;
 
 import java.sql.Date;
 import java.time.LocalDate;

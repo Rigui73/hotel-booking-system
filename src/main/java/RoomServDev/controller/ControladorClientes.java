@@ -3,13 +3,9 @@ package RoomServDev.controller;
 import RoomServDev.model.Cliente;
 import RoomServDev.model.ClienteConReservaException;
 import RoomServDev.model.ClienteDuplicadoException;
+import RoomServDev.persistence.dao.ClienteDAO;
 import RoomServDev.view.VistaCliente;
-import RoomServDev.model.dao.ClienteDAO;
-
-
-import java.sql.SQLException;
 import java.util.List;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 public class ControladorClientes {
 

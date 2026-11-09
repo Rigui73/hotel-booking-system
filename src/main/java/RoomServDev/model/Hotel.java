@@ -5,8 +5,6 @@ import java.util.List;
 
 public class Hotel {
 
-    // ********* Atributos  *********
-
     private int idHotel;
     private String nombre;
     private String direccion;
@@ -15,19 +13,9 @@ public class Hotel {
 
     private List<Habitacion> habitaciones;
 
-// ********* Constructor  *********
-
-    public Hotel(){
-
-        this.nombre = nombre;
-        this.direccion = direccion;
-        this.ciudad = ciudad;
-        this.telefono = telefono;
-
+    public Hotel() {
         this.habitaciones = new ArrayList<>();
     }
-
-// *********GETTERS y SETTERS *********
 
     public int getIdHotel() {
         return idHotel;
@@ -37,57 +25,55 @@ public class Hotel {
         this.idHotel = idHotel;
     }
 
-    public String getNombre(){
+    public String getNombre() {
         return nombre;
     }
 
-    public void setNombre (String nombre){
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public String getDireccion(){
+    public String getDireccion() {
         return direccion;
     }
 
-    public void setDireccion (String direccion){
+    public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
 
-    public String getCiudad(){
+    public String getCiudad() {
         return ciudad;
     }
 
-    public void setCiudad (String ciudad){
+    public void setCiudad(String ciudad) {
         this.ciudad = ciudad;
     }
 
-    public int getTelefono(){
+    public int getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono){
+    public void setTelefono(int telefono) {
         this.telefono = telefono;
     }
 
-    //getter para obtener la lista de habitaciones de un hotel
+    // getter para obtener la lista de habitaciones de un hotel
     public List<Habitacion> getHabitaciones() {
         return habitaciones;
     }
 
-    //setter para meter habitaciones a un hotel
+    // setter para meter habitaciones a un hotel
 
-    public void anadirHabitacion(Habitacion habitacion){
+    public void anadirHabitacion(Habitacion habitacion) {
         this.habitaciones.add(habitacion);
     }
 
-
-
     @Override
-        public String toString(){
+    public String toString() {
         return "Hotel{" +
-                "idHotel=" + idHotel +'\'' +
+                "idHotel=" + idHotel + '\'' +
                 "nombre='" + nombre + '\'' +
-                ",direccion='" + direccion + '\''+
+                ",direccion='" + direccion + '\'' +
                 ",ciudad='" + ciudad + '\'' +
                 ",telefono=" + telefono +
                 '}';

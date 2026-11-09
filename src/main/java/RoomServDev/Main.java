@@ -1,13 +1,16 @@
 package RoomServDev;
 
-import java.time.LocalDate;
-import java.sql.Date;
 import java.util.Scanner;
 
 import RoomServDev.controller.ControladorClientes;
-import RoomServDev.model.*;
-import RoomServDev.model.dao.ClienteDAO;
-import RoomServDev.model.dao.ClienteDAOImpl;
+import RoomServDev.model.Cliente;
+import RoomServDev.model.Datos;
+import RoomServDev.model.Doble;
+import RoomServDev.model.Hotel;
+import RoomServDev.model.Simple;
+import RoomServDev.model.Suite;
+import RoomServDev.persistence.dao.ClienteDAO;
+import RoomServDev.persistence.factory.DAOFactory;
 import RoomServDev.view.VistaCliente;
 import RoomServDev.view.vistaMenus;
 
@@ -28,8 +31,8 @@ public class Main {
         cargarDatosPrueba(datos);
 
         // Creamos objeto que implementa la interfaz
-
-        ClienteDAO miClienteDAO = new ClienteDAOImpl();
+        DAOFactory factory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        ClienteDAO miClienteDAO = factory.getClienteDAO();
 
         // 3. Instanciamos vistas y controladores
 
@@ -91,8 +94,7 @@ public class Main {
             // Cliente inicial
             datos.anadirCliente(new Cliente(
                     "Adria", "Rigall", "Prat",
-                    "12345678A", 612345678, "arigallp@uoc.edu"
-            ));
+                    "12345678A", 612345678, "arigallp@uoc.edu"));
 
             // Hotel inicial con sus habitaciones
             Hotel hotel = new Hotel();
@@ -104,7 +106,6 @@ public class Main {
             Simple habSimple = new Simple(101, 1, 75.00, "Simple", "90x200", true);
             Doble habDoble = new Doble(201, 3, 120.00, 2, "Doble", "Matrimonio", true, 25.00, true);
             Suite suite = new Suite(301, 4, 220.00, "Suite", 2, true, true, true, "Minibar y terraza");
-
 
             hotel.getHabitaciones().add(habSimple);
             hotel.getHabitaciones().add(habDoble);

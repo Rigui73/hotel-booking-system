@@ -1,4 +1,4 @@
-package RoomServDev.model.dao;
+package RoomServDev.persistence.dao;
 
 
 import java.sql.Connection;
