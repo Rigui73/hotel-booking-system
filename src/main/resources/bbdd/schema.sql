@@ -1,37 +1,28 @@
-CREATE DATABASE  IF NOT EXISTS `roomservdev_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE  IF NOT EXISTS `roomservdev_db`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
 USE `roomservdev_db`;
--- MySQL dump 10.13  Distrib 8.0.44, for macos15 (arm64)
 --
 -- Host: 127.0.0.1    Database: roomservdev_db
 -- ------------------------------------------------------
 -- Server version	9.6.0
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
-SET @@SESSION.SQL_LOG_BIN= 0;
-
 --
--- GTID state at the beginning of the backup 
+-- ELIMINACIÓN DE TABLAS (orden inverso de dependencias)
 --
 
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '86ca8640-17f6-11f1-bfc0-c3d0c775f468:1-468';
+DROP TABLE IF EXISTS `reservas`;
+DROP TABLE IF EXISTS `habitaciones_suite`;
+DROP TABLE IF EXISTS `habitaciones_doble`;
+DROP TABLE IF EXISTS `habitaciones_simple`;
+DROP TABLE IF EXISTS `habitaciones`;
+DROP TABLE IF EXISTS `clientes`;
+DROP TABLE IF EXISTS `hoteles`;
 
 --
 -- Table structure for table `clientes`
 --
-
-DROP TABLE IF EXISTS `clientes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `clientes` (
   `dni` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -42,15 +33,23 @@ CREATE TABLE `clientes` (
   PRIMARY KEY (`dni`),
   UNIQUE KEY `dni_UNIQUE` (`dni`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `hoteles`
+--
+CREATE TABLE `hoteles` (
+  `id_hotel` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `direccion` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ciudad` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `telefono` int NOT NULL,
+  PRIMARY KEY (`id_hotel`),
+  UNIQUE KEY `nombre_UNIQUE` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Table structure for table `habitaciones`
 --
-
-DROP TABLE IF EXISTS `habitaciones`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `habitaciones` (
     id_habitacion INT AUTO_INCREMENT PRIMARY KEY,
     num_habitacion INT NOT NULL,
@@ -62,33 +61,76 @@ CREATE TABLE `habitaciones` (
     CONSTRAINT fk_habitaciones_hoteles
         FOREIGN KEY (id_hotel) REFERENCES hoteles (id_hotel) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
--- Table structure for table `hoteles`
+-- Table structure for table `habitaciones_simple`
 --
+CREATE TABLE habitaciones_simple (
+    id_habitacion INT NOT NULL,
+    medida_cama VARCHAR(20) NOT NULL,
+    tiene_escritorio BOOLEAN NOT NULL,
 
-DROP TABLE IF EXISTS `hoteles`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `hoteles` (
-  `id_hotel` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `direccion` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ciudad` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` int NOT NULL,
-  PRIMARY KEY (`id_hotel`),
-  UNIQUE KEY `nombre_UNIQUE` (`nombre`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+    PRIMARY KEY (id_habitacion),
+
+    CONSTRAINT fk_simple_habitacion
+        FOREIGN KEY (id_habitacion)
+        REFERENCES habitaciones (id_habitacion)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `habitaciones_doble`
+--
+CREATE TABLE habitaciones_doble (
+    id_habitacion INT NOT NULL,
+    tipo_cama_doble VARCHAR(30) NOT NULL,
+    supletoria BOOLEAN NOT NULL,
+    suplemento_supletoria DECIMAL(8,2) NOT NULL,
+    balcon BOOLEAN NOT NULL,
+
+    PRIMARY KEY (id_habitacion),
+
+    CONSTRAINT fk_doble_habitacion
+        FOREIGN KEY (id_habitacion)
+        REFERENCES habitaciones (id_habitacion)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Table structure for table `habitaciones_suite`
+--
+CREATE TABLE habitaciones_suite (
+    id_habitacion INT NOT NULL,
+    num_ambientes INT NOT NULL,
+    jacuzzi BOOLEAN NOT NULL,
+    incluye_spa BOOLEAN NOT NULL,
+    incluye_terraza BOOLEAN NOT NULL,
+    otros_servicios VARCHAR(255),
+
+    PRIMARY KEY (id_habitacion),
+
+    CONSTRAINT fk_suite_habitacion
+        FOREIGN KEY (id_habitacion)
+        REFERENCES habitaciones (id_habitacion)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
 
 --
 -- Table structure for table `reservas`
 --
-
-DROP TABLE IF EXISTS `reservas`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reservas` (
   `id_reserva` int NOT NULL AUTO_INCREMENT,
   `fecha_entrada` date NOT NULL,
@@ -104,20 +146,3 @@ CREATE TABLE `reservas` (
   CONSTRAINT `fk_reservas_clientes` FOREIGN KEY (`dni_cliente`) REFERENCES `clientes` (`dni`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_reservas_habitaciones` FOREIGN KEY (`id_habitacion`) REFERENCES `habitaciones` (`id_habitacion`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping routines for database 'roomservdev_db'
---
-SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-11-03 12:29:42

@@ -1,6 +1,8 @@
-package RoomServDev.model.dao;
+package RoomServDev.persistence.dao.mysql;
 
 import RoomServDev.model.Reserva;
+import RoomServDev.persistence.dao.ConexionBD;
+import RoomServDev.persistence.dao.ReservaDAO;
 
 import java.sql.Connection;
 import java.sql.Date;
