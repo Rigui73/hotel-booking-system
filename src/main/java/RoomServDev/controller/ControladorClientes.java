@@ -30,8 +30,6 @@ public class ControladorClientes {
             clienteDAO.insertar(new Cliente(nombre.trim(), apellido1.trim(), ap2, dni.trim().toUpperCase(), telefono, email.trim()));
         } catch (java.sql.SQLIntegrityConstraintViolationException e) {
             throw new ClienteDuplicadoException("El DNI " + dni + " ya existe en el sistema");
-        } catch (java.sql.SQLException e) {
-            System.err.println("Error al insertar el cliente: " + e.getMessage());
         }
     }
 

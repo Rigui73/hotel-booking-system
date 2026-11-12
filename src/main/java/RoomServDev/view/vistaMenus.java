@@ -2,6 +2,7 @@ package RoomServDev.view;
 
 import RoomServDev.model.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -44,6 +45,26 @@ public class vistaMenus {
         System.out.print("Elige una opción: ");
         String respuesta = input.nextLine().trim();
         return respuesta.isEmpty() ? ' ' : respuesta.charAt(0);
+    }
+
+    public String pedirTexto(String mensaje){
+        System.out.print(mensaje);
+        return input.nextLine().trim();
+    }
+
+    public int pedirEntero(String mensaje){
+        System.out.print(mensaje);
+        return Integer.parseInt(input.nextLine().trim());
+    }
+
+    public boolean pedirBooleano(String mensaje) {
+        System.out.print(mensaje);
+        return Boolean.parseBoolean(input.nextLine().trim());
+    }
+
+    public LocalDate pedirFecha(String mensaje) {
+        System.out.print(mensaje + " (aaaa-mm-dd): ");
+        return LocalDate.parse(input.nextLine().trim());
     }
 
     // ==========================================
@@ -241,7 +262,8 @@ public class vistaMenus {
 
         Habitacion hab;
         if ("Doble".equalsIgnoreCase(cat)) {
-            hab = new Doble(num, cap, precio, cap, "Doble", "Matrimonio", true, 25.0, disp);
+            boolean balcon = pedirBooleano("¿Tiene balcón? (true/false): ");
+            hab = new Doble(num, cap, precio, cap, "Doble", "Matrimonio", true, 25.0, balcon);
         } else if ("Suite".equalsIgnoreCase(cat)) {
             hab = new Suite(num, cap, precio, "Suite", 2, true, true, true, "Servicio completo");
         } else {
@@ -280,8 +302,14 @@ public class vistaMenus {
             return;
         }
         for (Reserva r : reservas) {
-            System.out.println("- Hotel: " + r.getNombreHotel() + " | Hab: " + r.getNumHabitacion()
-                    + " | DNI Cliente: " + r.getDniCliente() + " | Activa: " + r.isEstado());
+            System.out.println("- Id: " + r.getIdReserva()
+            + " Hotel: " + r.getNombreHotel()
+            + " Hab: " + r.getNumHabitacion()
+            + " DNI: " + r.getDniCliente()
+            + " Entrada: " + r.getFechaEntrada()
+            + " Salida: " + r.getFechaSalida()
+            + " Importe: " + r.getImporteTotal()
+            + " Activa: " + (r.isEstado() ? "Sí" : "No"));
         }
     }
 
@@ -300,14 +328,18 @@ public class vistaMenus {
         System.out.print("Introduce el número de habitación: ");
         int hab = Integer.parseInt(input.nextLine().trim());
 
-        System.out.print("Introduce el número de huéspedes: ");
-        int huespedes = Integer.parseInt(input.nextLine().trim());
+        int huespedes = pedirEntero("Introduce el número de huéspedes: ");
+        LocalDate entrada = pedirFecha("Fecha de entrada");
+        LocalDate salida = pedirFecha("Fecha de salida");
 
         Reserva r = new Reserva();
         r.setDniCliente(dni);
         r.setNombreHotel(hotel);
         r.setNumHabitacion(hab);
         r.setNumHuespedes(huespedes);
+        r.setFechaEntrada(java.sql.Date.valueOf(entrada));
+        r.setFechaSalida(java.sql.Date.valueOf(salida));
+        r.setFechaReserva(java.sql.Date.valueOf(LocalDate.now()));
         r.setEstado(true);
         return r;
     }
