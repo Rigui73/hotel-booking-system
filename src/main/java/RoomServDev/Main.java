@@ -1,17 +1,22 @@
 package RoomServDev;
 
+import java.time.LocalDate;
 import java.util.Scanner;
 
 import RoomServDev.controller.ControladorClientes;
-import RoomServDev.model.Cliente;
-import RoomServDev.model.Datos;
-import RoomServDev.model.Doble;
+import RoomServDev.controller.ControladorHabitaciones;
+import RoomServDev.controller.ControladorHoteles;
+import RoomServDev.controller.ControladorReservas;
+import RoomServDev.model.Habitacion;
 import RoomServDev.model.Hotel;
-import RoomServDev.model.Simple;
-import RoomServDev.model.Suite;
 import RoomServDev.persistence.dao.ClienteDAO;
+import RoomServDev.persistence.dao.HabitacionDAO;
+import RoomServDev.model.Reserva;
+import RoomServDev.persistence.dao.HotelDAO;
+import RoomServDev.persistence.dao.ReservaDAO;
 import RoomServDev.persistence.factory.DAOFactory;
 import RoomServDev.view.VistaCliente;
+import RoomServDev.view.VistaHotel;
 import RoomServDev.view.vistaMenus;
 
 public class Main {
@@ -24,20 +29,21 @@ public class Main {
     }
 
     void programa() {
-        // 1. Instanciamos el modelo central de datos
-        Datos datos = new Datos();
-
-        // 2. Precargamos los datos iniciales de prueba en el modelo
-        cargarDatosPrueba(datos);
 
         // Creamos objeto que implementa la interfaz
         DAOFactory factory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
-        ClienteDAO miClienteDAO = factory.getClienteDAO();
+        HotelDAO hotelDAO = factory.getHotelDAO();
+        ClienteDAO clienteDAO = factory.getClienteDAO();
+        HabitacionDAO habitacionDAO = factory.getHabitacionDAO();
+        ReservaDAO reservaDAO = factory.getReservaDAO();
 
         // 3. Instanciamos vistas y controladores
 
         VistaCliente vistaCliente = new VistaCliente(input);
-        ControladorClientes controladorClientes = new ControladorClientes(vistaCliente, miClienteDAO);
+        ControladorClientes controladorClientes = new ControladorClientes(vistaCliente, clienteDAO);
+        ControladorHoteles controladorHoteles = new ControladorHoteles(hotelDAO, habitacionDAO);
+        ControladorHabitaciones controladorHabitaciones = new ControladorHabitaciones(habitacionDAO, reservaDAO);
+        ControladorReservas controladorReservas = new ControladorReservas(reservaDAO, controladorClientes, controladorHoteles, controladorHabitaciones);
 
         // Vista de menús provisional para el resto de módulos aún no migrados
         vistaMenus vistaGeneral = new vistaMenus(input);
@@ -63,13 +69,13 @@ public class Main {
                     controladorClientes.gestionarMenu();
                     break;
                 case '2':
-                    ejecutarSubmenuHoteles(vistaGeneral, datos);
+                    ejecutarSubmenuHoteles(vistaGeneral, controladorHoteles);
                     break;
                 case '3':
-                    ejecutarSubmenuHabitaciones(vistaGeneral, datos);
+                    ejecutarSubmenuHabitaciones(vistaGeneral, controladorHoteles, controladorHabitaciones);
                     break;
                 case '4':
-                    ejecutarSubmenuReservas(vistaGeneral, datos);
+                    ejecutarSubmenuReservas(vistaGeneral, controladorReservas);
                     break;
                 case '0':
                     System.out.println("[INFO] Saliendo del sistema...");
@@ -88,103 +94,142 @@ public class Main {
         return respuesta.isEmpty() ? ' ' : respuesta.charAt(0);
     }
 
-    // --- CARGA DE DATOS EN MEMORIA ---
-    private void cargarDatosPrueba(Datos datos) {
-        try {
-            // Cliente inicial
-            datos.anadirCliente(new Cliente(
-                    "Adria", "Rigall", "Prat",
-                    "12345678A", 612345678, "arigallp@uoc.edu"));
-
-            // Hotel inicial con sus habitaciones
-            Hotel hotel = new Hotel();
-            hotel.setNombre("Hotel Central");
-            hotel.setCiudad("Barcelona");
-            hotel.setDireccion("Gran Via 123");
-            hotel.setTelefono(933001122);
-
-            Simple habSimple = new Simple(101, 1, 75.00, "Simple", "90x200", true);
-            Doble habDoble = new Doble(201, 3, 120.00, 2, "Doble", "Matrimonio", true, 25.00, true);
-            Suite suite = new Suite(301, 4, 220.00, "Suite", 2, true, true, true, "Minibar y terraza");
-
-            hotel.getHabitaciones().add(habSimple);
-            hotel.getHabitaciones().add(habDoble);
-            hotel.getHabitaciones().add(suite);
-
-            datos.anadirHotel(hotel);
-
-        } catch (Exception e) {
-            System.err.println("[AVISO] Error cargando datos iniciales: " + e.getMessage());
-        }
-    }
-
     // --- BUCLES TEMPORALES MIENTRAS SE MIGRA AL RESPECTIVO CONTROLADOR ---
-    private void ejecutarSubmenuHoteles(vistaMenus vista, Datos datos) {
+    private void ejecutarSubmenuHoteles(vistaMenus vista, ControladorHoteles controlador) {
         boolean volver = false;
         do {
             char op = vista.mostrarMenuHoteles();
-            switch (op) {
-                case '1' -> vista.listarHoteles(datos.listarHoteles());
-                case '2' -> {
-                    try {
-                        datos.anadirHotel(vista.anadirHotel());
+            try {
+                switch (op) {
+                    case '1' -> vista.listarHoteles(controlador.listarHoteles());
+                    case '2' -> {
+                        Hotel nuevo = vista.anadirHotel();
+                        controlador.crearHotel(nuevo.getNombre(), nuevo.getDireccion(), nuevo.getCiudad(), nuevo.getTelefono());
                         vista.mostrarMensaje("Hotel añadido correctamente.");
-                    } catch (Exception e) {
-                        vista.mostrarError(e.getMessage());
                     }
-                }
-                case '3' -> {
-                    vista.editarHotel();
-                    // Aquí conectaremos la modificación cuando definamos ControladorHotel
-                }
-                case '4' -> {
-                    String nombreHotel = vista.pedirNombreHotel();
-                    try {
-                        datos.eliminarHotel(nombreHotel);
-                        vista.mostrarMensaje("Hotel eliminado con éxito.");
-                    } catch (Exception e) {
-                        vista.mostrarError(e.getMessage());
+                    case '3' -> {
+                        String nombre = vista.pedirNombreHotel();
+                        String direccion = vista.pedirTexto("Introduce la nueva dirección: ");
+                        String ciudad = vista.pedirTexto("Introduce la nueva ciudad: ");
+                        int telefono = vista.pedirEntero("Introduce el nuevo teléfono: ");
+                        controlador.editarHotel(nombre, direccion, ciudad, telefono);
+                        vista.mostrarMensaje("Hotel editado correctamente.");
                     }
+                    case '4' -> {
+                        controlador.eliminarHotel(vista.pedirNombreHotel());
+                        vista.mostrarMensaje("Hotel eliminado correctamente.");
+                    }
+                    case '0' -> volver = true;
+                    default -> vista.mostrarError("Opción no válida.");
                 }
-                case '0' -> volver = true;
-                default -> vista.mostrarError("Opción no válida.");
+            } catch (Exception e) {
+                vista.mostrarError(e.getMessage());
             }
         } while (!volver);
     }
 
-    private void ejecutarSubmenuHabitaciones(vistaMenus vista, Datos datos) {
+    private void ejecutarSubmenuHabitaciones(vistaMenus vista, ControladorHoteles controladorHoteles,
+                                             ControladorHabitaciones controladorHabitaciones) {
         boolean volver = false;
         do {
             char op = vista.mostrarMenuHabitaciones();
-            switch (op) {
-                case '1' -> {
-                    String h = vista.pedirNombreHotel();
-                    for (Hotel hotel : datos.listarHoteles()) {
-                        if (hotel.getNombre().equalsIgnoreCase(h)) {
-                            vista.listarHabitaciones(hotel.getHabitaciones());
-                            break;
+            try {
+                switch (op) {
+                    case '1' -> {
+                        Hotel hotel = buscarHotelObligatorio(vista, controladorHoteles);
+                        if (hotel != null) {
+                            vista.listarHabitaciones(controladorHabitaciones.listarHabitaciones(hotel));
                         }
                     }
+                    case '2' -> {
+                        Hotel hotel = buscarHotelObligatorio(vista, controladorHoteles);
+                        if (hotel != null) {
+                            Habitacion habitacion = vista.anadirHabitacion();
+                            controladorHabitaciones.guardarHabitacion(hotel, habitacion);
+                            vista.mostrarMensaje("Habitación añadida al hotel '" + hotel.getNombre() + "'.");
+                        }
+                    }
+                    case '3' -> {
+                        Hotel hotel = buscarHotelObligatorio(vista, controladorHoteles);
+                        if (hotel != null) {
+                            int numero = vista.pedirNumHabitacion();
+                            int capacidad = vista.pedirEntero("Nueva capacidad: ");
+                            double precio = vista.pedirPrecio();
+                            boolean disponible = vista.pedirBooleano("¿Está disponible? (true/false): ");
+                            controladorHabitaciones.editarHabitacion(hotel, numero, capacidad, precio, disponible);
+                            vista.mostrarMensaje("Habitación modificada correctamente.");
+                        }
+                    }
+                    case '4' -> {
+                        Hotel hotel = buscarHotelObligatorio(vista, controladorHoteles);
+                        if (hotel != null) {
+                            controladorHabitaciones.eliminarHabitacion(hotel, vista.pedirNumHabitacion());
+                            vista.mostrarMensaje("Habitación eliminada correctamente.");
+                        }
+                    }
+                    case '0' -> volver = true;
+                    default -> vista.mostrarError("Opción no válida.");
                 }
-                case '0' -> volver = true;
-                default -> vista.mostrarError("Opción no válida.");
+            } catch (Exception e) {
+                vista.mostrarError(e.getMessage());
             }
         } while (!volver);
     }
 
-    private void ejecutarSubmenuReservas(vistaMenus vista, Datos datos) {
+    private void ejecutarSubmenuReservas(vistaMenus vista, ControladorReservas controlador) {
         boolean volver = false;
         do {
             char op = vista.mostrarMenuReservas();
-            switch (op) {
-                case '1' -> vista.listarReservas(datos.listarReservas());
-                case '2' -> {
-                    datos.anadirReservas(vista.anadirReserva());
-                    vista.mostrarMensaje("Reserva registrada.");
+            try {
+                switch (op) {
+                    case '1' -> vista.listarReservas(controlador.listarReservas());
+                    case '2' -> {
+                        String dni = vista.pedirDni();
+                        String hotel = vista.pedirNombreHotel();
+                        int habitacion = vista.pedirNumHabitacion();
+                        int huespedes = vista.pedirEntero("Introduce el número de huéspedes: ");
+                        LocalDate entrada = vista.pedirFecha("Fecha de entrada");
+                        LocalDate salida = vista.pedirFecha("Fecha de salida");
+                        Reserva reserva = controlador.crearReserva(dni, hotel, habitacion, entrada, salida, huespedes);
+                        vista.mostrarMensaje("Reserva confirmada. Id: " + reserva.getIdReserva()
+                                + ". Importe: " + reserva.getImporteTotal() + "€");
+                    }
+                    case '3' -> {
+                        int id = vista.pedirEntero("Id de la reserva: ");
+                        LocalDate entrada = vista.pedirFecha("Nueva fecha de entrada");
+                        LocalDate salida = vista.pedirFecha("Nueva fecha de salida");
+                        int huespedes = vista.pedirEntero("Nuevo número de huéspedes: ");
+                        controlador.editarReserva(id, entrada, salida, huespedes);
+                        vista.mostrarMensaje("Reserva modificada correctamente.");
+                    }
+                    case '4' -> {
+                        int id = vista.pedirEntero("Id de la reserva: ");
+                        String modo = vista.pedirTexto("Escribe C para cancelar o E para eliminar: ");
+                        if (modo.equalsIgnoreCase("E")) {
+                            controlador.eliminarReserva(id);
+                            vista.mostrarMensaje("Reserva eliminada. Si estaba activa, la habitación vuelve a estar libre.");
+                        } else if (modo.equalsIgnoreCase("C")) {
+                            controlador.cancelarReserva(id);
+                            vista.mostrarMensaje("Reserva cancelada. La habitación vuelve a estar libre.");
+                        } else {
+                            vista.mostrarError("Indica C para cancelar o E para eliminar.");
+                        }
+                    }
+                    case '0' -> volver = true;
+                    default -> vista.mostrarError("Opción no válida.");
                 }
-                case '0' -> volver = true;
-                default -> vista.mostrarError("Opción no válida.");
+            } catch (Exception e) {
+                vista.mostrarError(e.getMessage());
             }
         } while (!volver);
+    }
+
+    private Hotel buscarHotelObligatorio(vistaMenus vista, ControladorHoteles controlador) throws Exception {
+        String nombre = vista.pedirNombreHotel();
+        Hotel hotel = controlador.buscarHotel(nombre);
+        if (hotel == null) {
+            vista.mostrarError("No existe ningún hotel con ese nombre.");
+        }
+        return hotel;
     }
 }

@@ -301,7 +301,7 @@ public class HotelController {
 
                     //validamos que existe el hotel
 
-                    Hotel hotel = buscarHotelInterno(nuevaReserva.getDniCliente());
+                    Hotel hotel = buscarHotelInterno(nuevaReserva.getNombreHotel());
                     if (hotel == null) {
                         vista.mostrarMensaje(("ERROR: El hotel '" + nuevaReserva.getNombreHotel() + "' no existe en el sistema.")  );
                         break;

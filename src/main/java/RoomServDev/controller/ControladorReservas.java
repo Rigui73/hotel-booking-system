@@ -1,13 +1,14 @@
 package RoomServDev.controller;
 
 import RoomServDev.model.Cliente;
-import RoomServDev.model.Datos;
 import RoomServDev.model.Doble;
 import RoomServDev.model.Habitacion;
 import RoomServDev.model.Hotel;
 import RoomServDev.model.Reserva;
 import RoomServDev.model.ReservaSolapadaException;
+import RoomServDev.persistence.dao.ReservaDAO;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -17,15 +18,15 @@ import java.util.List;
 
 public class ControladorReservas {
 
-    private final Datos datos;
+    private final ReservaDAO reservaDAO;
     private final ControladorClientes ctrlClientes;
     private final ControladorHoteles ctrlHoteles;
     private final ControladorHabitaciones ctrlHabitaciones;
 
     // Necesita los otros controladores para comprobar que cliente, hotel y habitación existen
-    public ControladorReservas(Datos datos, ControladorClientes ctrlClientes,
+    public ControladorReservas(ReservaDAO reservaDAO, ControladorClientes ctrlClientes,
                                ControladorHoteles ctrlHoteles, ControladorHabitaciones ctrlHabitaciones) {
-        this.datos = datos;
+        this.reservaDAO = reservaDAO;
         this.ctrlClientes = ctrlClientes;
         this.ctrlHoteles = ctrlHoteles;
         this.ctrlHabitaciones = ctrlHabitaciones;
@@ -36,7 +37,7 @@ public class ControladorReservas {
     // El id, la fecha de reserva, el estado y el importe los pone el controlador, no el usuario
     public Reserva crearReserva(String dni, String nombreHotel, int numHabitacion,
                                 LocalDate entrada, LocalDate salida, int numHuespedes)
-            throws ReservaSolapadaException, Exception {
+            throws ReservaSolapadaException, SQLException, Exception {
 
         Cliente cliente = ctrlClientes.buscarCliente(dni);
         if (cliente == null) {
@@ -54,11 +55,6 @@ public class ControladorReservas {
         validarHuespedes(habitacion, numHuespedes);
         comprobarSolapamiento(hotel.getNombre(), numHabitacion, entrada, salida, null);
 
-        // Cálculo del importe total: días de estancia * precio por noche
-        long diasEstancia = java.time.temporal.ChronoUnit.DAYS.between(entrada, salida);
-        if (diasEstancia <= 0) diasEstancia = 1;
-        double importeTotal = diasEstancia * habitacion.getPrecioNoche();
-
         // Fechas en formato java.sql.Date compatibles con la entidad Reserva
         java.sql.Date fechaHoy = java.sql.Date.valueOf(LocalDate.now());
         java.sql.Date fEntrada = java.sql.Date.valueOf(entrada);
@@ -72,34 +68,33 @@ public class ControladorReservas {
                 fEntrada,
                 fSalida,
                 numHuespedes,
-                importeTotal,
+                calcularImporte(habitacion, entrada, salida),
                 true,
                 hotel.getNombre(),
                 numHabitacion,
                 cliente.getDni()
         );
 
-        // Registro en la colección o persistencia
-        datos.anadirReservas(reserva);
-
+        reservaDAO.insertar(reserva);
         return reserva;
     }
 
-    public List<Reserva> listarReservasCliente(String dni) {
-        if (dni == null) return new ArrayList<>();
-        return datos.consultarReservasCliente(dni.trim());
+    public List<Reserva> listarReservas() throws SQLException {
+        return  reservaDAO.obtenerTodas();
     }
 
-    public Reserva buscarReserva(int idReserva) {
-        for (Reserva r : datos.listarReservas()) {
-            if (r.getIdReserva() == idReserva) return r;
-        }
-        return null;
+    public List<Reserva> listarReservasCliente(String dni) throws SQLException {
+        if (dni == null) return new ArrayList<>();
+        return reservaDAO.obtenerPorCliente(dni.trim());
+    }
+
+    public Reserva buscarReserva(int idReserva) throws SQLException {
+        return reservaDAO.obtenerPorId(idReserva);
     }
 
     // Editar: la reserva
     public void editarReserva(int idReserva, LocalDate nuevaEntrada, LocalDate nuevaSalida, int nuevosHuespedes)
-            throws ReservaSolapadaException {
+            throws ReservaSolapadaException, SQLException {
 
         Reserva reserva = obtenerReservaActiva(idReserva);
         Hotel hotel = obtenerHotel(reserva.getNombreHotel());
@@ -107,35 +102,31 @@ public class ControladorReservas {
 
         validarFechas(nuevaEntrada, nuevaSalida);
         validarHuespedes(habitacion, nuevosHuespedes);
+        comprobarSolapamiento(hotel.getNombre(), reserva.getNumHabitacion(), nuevaEntrada, nuevaSalida, reserva);
 
         // Datos.modificarReserva comprueba el solapamiento y actualiza fechas y huéspedes
-        datos.modificarReserva(reserva, aDate(nuevaEntrada), aDate(nuevaSalida), nuevosHuespedes);
+        reserva.setFechaEntrada(java.sql.Date.valueOf(nuevaEntrada));
+        reserva.setFechaSalida(java.sql.Date.valueOf(nuevaSalida));
+        reserva.setNumHuespedes(nuevosHuespedes);
         reserva.setImporteTotal(calcularImporte(habitacion, nuevaEntrada, nuevaSalida));
+        reservaDAO.actualizar(reserva);
     }
 
     // Cancelar: la reserva queda en el historial pero deja de estar activa
-    public void cancelarReserva(int idReserva) {
-        datos.cancelarReserva(obtenerReservaActiva(idReserva));
+    public void cancelarReserva(int idReserva) throws SQLException {
+        obtenerReservaActiva(idReserva);
+        reservaDAO.actualizarEstado(idReserva, false);
     }
 
     // Eliminar: la reserva desaparece por completo
-    public void eliminarReserva(int idReserva) {
-        Reserva reserva = buscarReserva(idReserva);
-        if (reserva == null) {
+    public void eliminarReserva(int idReserva) throws SQLException {
+        if (buscarReserva(idReserva) == null) {
             throw new IllegalArgumentException("No existe ninguna reserva con id " + idReserva);
         }
-        datos.listarReservas().remove(reserva);
+        reservaDAO.eliminar(idReserva);
     }
 
     // ********* Auxiliares (privados) *********
-
-    private int generarId() {
-        int max = 0;
-        for (Reserva r : datos.listarReservas()) {
-            if (r.getIdReserva() > max) max = r.getIdReserva();
-        }
-        return max + 1;
-    }
 
     private double calcularImporte(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
         long noches = ChronoUnit.DAYS.between(entrada, salida);
@@ -171,9 +162,9 @@ public class ControladorReservas {
     // "ignorar" sirve para no comparar una reserva consigo misma
     private void comprobarSolapamiento(String nombreHotel, int numHabitacion,
                                        LocalDate entrada, LocalDate salida, Reserva ignorar)
-            throws ReservaSolapadaException {
-        for (Reserva r : datos.listarReservas()) {
-            if (r == ignorar || !r.isEstado()) continue;
+            throws ReservaSolapadaException, SQLException {
+        for (Reserva r : reservaDAO.obtenerTodas()) {
+            if ((ignorar != null && r.getIdReserva() == ignorar.getIdReserva()) || !r.isEstado()) continue;
             if (r.getNombreHotel().equalsIgnoreCase(nombreHotel) && r.getNumHabitacion() == numHabitacion) {
                 LocalDate rEntrada = aLocalDate(r.getFechaEntrada());
                 LocalDate rSalida = aLocalDate(r.getFechaSalida());
@@ -185,7 +176,7 @@ public class ControladorReservas {
         }
     }
 
-    private Hotel obtenerHotel(String nombreHotel) {
+    private Hotel obtenerHotel(String nombreHotel) throws SQLException {
         Hotel hotel = ctrlHoteles.buscarHotel(nombreHotel);
         if (hotel == null) {
             throw new IllegalArgumentException("No existe ningún hotel llamado " + nombreHotel);
@@ -193,7 +184,7 @@ public class ControladorReservas {
         return hotel;
     }
 
-    private Habitacion obtenerHabitacion(Hotel hotel, int numHabitacion) {
+    private Habitacion obtenerHabitacion(Hotel hotel, int numHabitacion) throws SQLException {
         Habitacion habitacion = ctrlHabitaciones.buscarHabitacion(hotel, numHabitacion);
         if (habitacion == null) {
             throw new IllegalArgumentException("El hotel " + hotel.getNombre()
@@ -202,7 +193,7 @@ public class ControladorReservas {
         return habitacion;
     }
 
-    private Reserva obtenerReservaActiva(int idReserva) {
+    private Reserva obtenerReservaActiva(int idReserva) throws SQLException {
         Reserva reserva = buscarReserva(idReserva);
         if (reserva == null) {
             throw new IllegalArgumentException("No existe ninguna reserva con id " + idReserva);
@@ -214,11 +205,11 @@ public class ControladorReservas {
     }
 
     // La vista trabaja con LocalDate y el modelo con Date: estos dos métodos convierten
-    private Date aDate(LocalDate fecha) {
-        return Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
 
     private LocalDate aLocalDate(Date fecha) {
+        if (fecha instanceof java.sql.Date sqlDate){
+            return sqlDate.toLocalDate();
+        }
         return fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }
