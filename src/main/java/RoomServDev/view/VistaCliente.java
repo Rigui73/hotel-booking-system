@@ -19,7 +19,7 @@ public class VistaCliente {
         System.out.println("\n******************************************");
         System.out.println("1. Registrar nuevo cliente");
         System.out.println("2. Buscar cliente por DNI");
-        System.out.println("3. Listas todos los clientes");
+        System.out.println("3. Listar todos los clientes");
         System.out.println("4. Modificar datos de cliente");
         System.out.println("5. Eliminar datos de cliente");
         System.out.println("0. Volver al menú principal");

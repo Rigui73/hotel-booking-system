@@ -50,6 +50,7 @@ Actualmente, el proyecto se encuentra en proceso de migración desde una gestió
     - [Error de compilación por versión de Java](#error-de-compilación-por-versión-de-java)
     - [Error de tablas inexistentes](#error-de-tablas-inexistentes)
     - [Maven no descarga las dependencias](#maven-no-descarga-las-dependencias)
+    - [Configuración de la Base de Datos](#Configuración-de-la-base-de-datos)
   - [Autores](#autores)
   - [Código de conducta](#código-de-conducta)
   - [Licencia](#licencia)
@@ -484,6 +485,20 @@ Comprueba la conexión a Internet y vuelve a ejecutar:
 ```powershell
 .\mvnw.cmd clean test
 ```
+
+
+### Configuración de la Base de Datos
+
+### ⚙️ Configuración de la Base de Datos
+
+Para proteger las credenciales reales, este proyecto utiliza un archivo properties ignorado por Git. Para ejecutar el proyecto, siga estos dos pasos:
+
+1. Ejecute el script `schema.sql` (ubicado en src/main/resources/bbdd/) en su servidor MySQL local.
+2. En esa misma ruta (`src/main/resources/bbdd/`), duplique el archivo `db.properties.example` y renómbrelo a `db.properties`.
+3. Edite `db.properties` con sus credenciales locales de MySQL:
+   db.url=jdbc:mysql://localhost:3306/roomservdev_db
+   db.user=su_usuario
+   db.password=su_contraseña
 
 ## Autores
 
