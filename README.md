@@ -50,6 +50,7 @@ Actualmente, el proyecto se encuentra en proceso de migración desde una gestió
     - [Error de compilación por versión de Java](#error-de-compilación-por-versión-de-java)
     - [Error de tablas inexistentes](#error-de-tablas-inexistentes)
     - [Maven no descarga las dependencias](#maven-no-descarga-las-dependencias)
+    - [Configuración de la Base de Datos](#Configuración-de-la-base-de-datos)
   - [Autores](#autores)
   - [Código de conducta](#código-de-conducta)
   - [Licencia](#licencia)
@@ -488,7 +489,7 @@ Comprueba la conexión a Internet y vuelve a ejecutar:
 
 ### Configuración de la Base de Datos
 
-## ⚙️ Configuración de la Base de Datos
+### ⚙️ Configuración de la Base de Datos
 
 Para proteger las credenciales reales, este proyecto utiliza un archivo properties ignorado por Git. Para ejecutar el proyecto, siga estos dos pasos:
 
