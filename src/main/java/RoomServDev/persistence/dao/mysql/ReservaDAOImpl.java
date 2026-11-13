@@ -21,11 +21,11 @@ public class ReservaDAOImpl implements ReservaDAO {
             "SELECT hab.id_habitacion, hab.disponible " +
                     "FROM habitaciones hab " +
                     "JOIN hoteles hot ON hab.id_hotel = hot.id_hotel " +
-                    "WHERE LOWER(hot.nombre) = LOWER(?) AND hab.num_habitacion = ?" + "FOR UPDATE";
+                    "WHERE LOWER(hot.nombre) = LOWER(?) AND hab.num_habitacion = ? FOR UPDATE";
 
     private static final String SQL_SOLAPAMIENTO =
             "SELECT id_reserva, fecha_entrada, fecha_salida FROM reservas " +
-                    "WHERE estado = 1 AND id_habitacion = ? AND fecha_entrada < ? fecha_salida > ?";
+                    "WHERE estado = 1 AND id_habitacion = ? AND fecha_entrada < ? AND fecha_salida > ?";
 
     private static final String SQL_INSERT_RESERVA =
             "INSERT INTO reservas (fecha_entrada, fecha_salida, num_huespedes, importe_total, estado, dni_cliente, id_habitacion) " +
@@ -58,7 +58,7 @@ public class ReservaDAOImpl implements ReservaDAO {
             "UPDATE reservas SET estado = ? WHERE id_reserva = ?";
 
     private static final String SQL_ID_HABITACION_RESERVA =
-            "SELECT id_reserva, estado FROM reservas WHERE id_reserva = ? FOR UPDATE";
+            "SELECT id_reserva, estado, id_habitacion FROM reservas WHERE id_reserva = ? FOR UPDATE";
 
     private static final String SQL_LIBERAR_HABITACION =
             "UPDATE habitaciones SET disponible = 1 WHERE id_habitacion = " +
@@ -94,9 +94,9 @@ public class ReservaDAOImpl implements ReservaDAO {
                             " en el hotel " + reserva.getNombreHotel());
                 }
                 idHabitacionEncontrada = rs.getInt("id_habitacion");
-                if (!rs.getBoolean("disponible")) {
-                    throw new SQLException("La habitación " + reserva.getNumHabitacion() + " no esta disponible.");
-                }
+               //if (!rs.getBoolean("disponible")) {
+               //     throw new SQLException("La habitación " + reserva.getNumHabitacion() + " no esta disponible.");
+               // }
             }
 
             // 3. Insertamos el registro de la reserva
@@ -123,9 +123,9 @@ public class ReservaDAOImpl implements ReservaDAO {
             }
 
             // 4. Bloqueamos la disponibilidad de la habitación reservada
-            psBloquear = conn.prepareStatement(SQL_BLOQUEAR_HABITACION);
-            psBloquear.setInt(1, idHabitacionEncontrada);
-            psBloquear.executeUpdate();
+            //psBloquear = conn.prepareStatement(SQL_BLOQUEAR_HABITACION);
+            //psBloquear.setInt(1, idHabitacionEncontrada);
+            //psBloquear.executeUpdate();
 
             // 5. Si todo ha salido bien, confirmamos la transacción
             conn.commit();
