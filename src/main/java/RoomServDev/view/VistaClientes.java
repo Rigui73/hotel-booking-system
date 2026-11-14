@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Scanner;
 
 
-public class VistaCliente {
+public class VistaClientes {
     private final Scanner scanner;
 
-    public VistaCliente(Scanner scanner) {
+    public VistaClientes(Scanner scanner) {
         this.scanner = scanner;
     }
 
@@ -77,12 +77,14 @@ public class VistaCliente {
 
 
 
-public void mostrarDetalleCliente(String dni, String nombre, String telefono, String email){
+public void mostrarDetalleCliente(Cliente cliente){
+    String apellido2 = (cliente.getApellido2() == null || cliente.getApellido2().isBlank())
+            ? "" : " " + cliente.getApellido2();
     System.out.println("\n*********************** FICHA DEL CLIENTE ******************************");
-    System.out.println("DNI:        " + dni);
-    System.out.println("Nombre:     " + nombre);
-    System.out.println("Telefono:     " + telefono);
-    System.out.println("Email:     " + email);
+    System.out.println("DNI:        " + cliente.getDni());
+    System.out.println("Nombre:     " + cliente.getNombre() + " " + cliente.getApellido1() + apellido2);
+    System.out.println("Telefono:     " + cliente.getTelefono());
+    System.out.println("Email:     " + cliente.getEmail());
     System.out.println("**************************************************************************");
 }
 

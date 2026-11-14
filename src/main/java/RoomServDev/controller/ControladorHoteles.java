@@ -6,6 +6,7 @@ import RoomServDev.model.HotelConReservaException;
 import RoomServDev.model.HotelDuplicadoException;
 import RoomServDev.persistence.dao.HabitacionDAO;
 import RoomServDev.persistence.dao.HotelDAO;
+import RoomServDev.view.VistaHoteles;
 
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -107,6 +108,42 @@ public class ControladorHoteles {
             hotelDAO.eliminar(hotel.getIdHotel());
         } catch (SQLIntegrityConstraintViolationException e){
             throw new HotelConReservaException("No se puede eliminar el hotel " + nombre + " porque tiene habitaciones o reservas asociadas.");
+        }
+    }
+
+    public void gestionarMenu(VistaHoteles vista) {
+        boolean volver = false;
+        while (!volver) {
+            char opcion = vista.mostrarMenuHoteles();
+            try {
+                switch (opcion) {
+                    case '1' -> vista.listarHoteles(listarHoteles());
+                    case '2' -> {
+                        String nombre = vista.pedirNombreHotel();
+                        String direccion = vista.pedirDireccionHotel();
+                        String ciudad = vista.pedirCiudadHotel();
+                        int telefono = vista.pedirTelefonoHotel();
+                        crearHotel(nombre, direccion, ciudad, telefono);
+                        vista.mostrarMensaje("Hotel añadido correctamente.");
+                    }
+                    case '3' -> {
+                        String nombre = vista.pedirNombreHotel();
+                        String direccion = vista.pedirNuevaDireccion();
+                        String ciudad = vista.pedirNuevaCiudad();
+                        int telefono = vista.pedirNuevoTelefono();
+                        editarHotel(nombre, direccion, ciudad, telefono);
+                        vista.mostrarMensaje("Hotel editado correctamente.");
+                    }
+                    case '4' -> {
+                        eliminarHotel(vista.pedirNombreHotel());
+                        vista.mostrarMensaje("Hotel eliminado correctamente.");
+                    }
+                    case '0' -> volver = true;
+                    default -> vista.mostrarError("Opción no válida.");
+                }
+            } catch (Exception e) {
+                vista.mostrarError(e.getMessage());
+            }
         }
     }
 

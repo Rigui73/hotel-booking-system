@@ -4,17 +4,17 @@ import RoomServDev.model.Cliente;
 import RoomServDev.model.ClienteConReservaException;
 import RoomServDev.model.ClienteDuplicadoException;
 import RoomServDev.persistence.dao.ClienteDAO;
-import RoomServDev.view.VistaCliente;
+import RoomServDev.view.VistaClientes;
 import java.util.List;
 
 public class ControladorClientes {
 
     // atributos
-    private final VistaCliente vista;
+    private final VistaClientes vista;
     private final ClienteDAO clienteDAO;
 
 
-    public ControladorClientes(VistaCliente vista, ClienteDAO clienteDAO) {
+    public ControladorClientes(VistaClientes vista, ClienteDAO clienteDAO) {
         this.vista = vista;
         this.clienteDAO = clienteDAO;
     }
@@ -160,13 +160,7 @@ public class ControladorClientes {
         try {
             Cliente c = buscarCliente(dni);
             if (c != null) {
-                String ap2 = (c.getApellido2() == null || c.getApellido2().isBlank()) ? "" : " " + c.getApellido2();
-                vista.mostrarDetalleCliente(
-                        c.getDni(),
-                        c.getNombre() + " " + c.getApellido1() + ap2,
-                        String.valueOf(c.getTelefono()),
-                        c.getEmail()
-                );
+                vista.mostrarDetalleCliente(c);
             } else {
                 vista.mostrarError("No se encontró ningún cliente con DNI " + dni);
             }

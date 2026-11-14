@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import RoomServDev.model.Cliente;
+import RoomServDev.persistence.connection.DatabaseConnection;
 import RoomServDev.persistence.dao.ClienteDAO;
-import RoomServDev.persistence.dao.ConexionBD;
 
 //para evitar ataques SQL Injection
 public class ClienteDAOImpl implements ClienteDAO {
@@ -23,7 +23,7 @@ public class ClienteDAOImpl implements ClienteDAO {
     @Override
 
     public void insertar(Cliente cliente) throws SQLException {
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_INSERT)) {
             ps.setString(1, cliente.getDni().toUpperCase().trim());
             ps.setString(2, cliente.getNombre().trim());
@@ -32,14 +32,15 @@ public class ClienteDAOImpl implements ClienteDAO {
             ps.setInt(5, cliente.getTelefono());
             ps.setString(6, cliente.getEmail());
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() != 1)
+                throw new SQLException("No se pudo insertar el cliente.");
         }
     }
 
     @Override
 
     public Cliente obtenerPorDni(String dni) throws SQLException {
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_DNI)) {
 
             ps.setString(1, dni.toUpperCase().trim());
@@ -56,7 +57,7 @@ public class ClienteDAOImpl implements ClienteDAO {
     @Override
     public List<Cliente> obtenerTodosClientes() throws SQLException {
         List<Cliente> lista = new ArrayList<>();
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_ALL);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -68,7 +69,7 @@ public class ClienteDAOImpl implements ClienteDAO {
 
     @Override
     public void actualizar(String dniAntiguo, Cliente cliente) throws SQLException {
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_UPDATE)) {
 
             ps.setString(1, cliente.getDni().toUpperCase().trim());
@@ -79,17 +80,20 @@ public class ClienteDAOImpl implements ClienteDAO {
             ps.setString(6, cliente.getEmail());
             ps.setString(7, dniAntiguo.toUpperCase().trim());
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() == 0 && !existeCliente(conn, cliente.getDni())) {
+                throw new SQLException("No existe el cliente " + dniAntiguo + " para actualizar.");
+            }
         }
     }
 
     @Override
     public void eliminar(String dni) throws SQLException {
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_DELETE)) {
 
             ps.setString(1, dni.toUpperCase().trim());
-            ps.executeUpdate();
+            if (ps.executeUpdate() != 1)
+                throw new SQLException("No existe el cliente " + dni + " para eliminar.");
         }
     }
 
@@ -103,5 +107,14 @@ public class ClienteDAOImpl implements ClienteDAO {
                 rs.getString("dni"),
                 rs.getInt("telefono"),
                 rs.getString("email"));
+    }
+
+    private boolean existeCliente(Connection conn, String dni) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM clientes WHERE dni = ?")) {
+            ps.setString(1, dni.toUpperCase().trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 }

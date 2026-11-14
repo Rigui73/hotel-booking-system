@@ -8,6 +8,7 @@ import RoomServDev.model.Simple;
 import RoomServDev.model.Suite;
 import RoomServDev.persistence.dao.HabitacionDAO;
 import RoomServDev.persistence.dao.ReservaDAO;
+import RoomServDev.view.VistaHabitaciones;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -142,6 +143,70 @@ public class ControladorHabitaciones {
                     + " porque tiene reservas activas.");
         }
         habitacionDAO.eliminar(h.getIdHabitacion());
+    }
+
+    public void gestionarMenu(VistaHabitaciones vista, ControladorHoteles controladorHoteles) {
+        boolean volver = false;
+        while (!volver) {
+            char opcion = vista.mostrarMenuHabitaciones();
+            try {
+                switch (opcion) {
+                    case '1' -> {
+                        Hotel hotel = seleccionarHotel(vista, controladorHoteles);
+                        if (hotel != null) vista.listarHabitaciones(listarHabitaciones(hotel));
+                    }
+                    case '2' -> {
+                        Hotel hotel = seleccionarHotel(vista, controladorHoteles);
+                        if (hotel != null) {
+                            int numero = vista.pedirNumHabitacion();
+                            int capacidad = vista.pedirCapacidad();
+                            double precio = vista.pedirPrecio();
+                            boolean disponible = vista.pedirDisponibilidad();
+                            String categoria = vista.pedirCategoria();
+                            if ("Doble".equalsIgnoreCase(categoria)) {
+                                crearHabitacionDoble(hotel, numero, capacidad, precio, disponible,
+                                        "Matrimonio", true, 25.0, vista.pedirBalcon());
+                            } else if ("Suite".equalsIgnoreCase(categoria)) {
+                                crearHabitacionSuite(hotel, numero, capacidad, precio, disponible,
+                                        2, true, true, true, "Servicio completo");
+                            } else {
+                                crearHabitacionSimple(hotel, numero, capacidad, precio, disponible,
+                                        "90x200", true);
+                            }
+                            vista.mostrarMensaje("Habitación añadida al hotel '" + hotel.getNombre() + "'.");
+                        }
+                    }
+                    case '3' -> {
+                        Hotel hotel = seleccionarHotel(vista, controladorHoteles);
+                        if (hotel != null) {
+                            int numero = vista.pedirNumHabitacion();
+                            int capacidad = vista.pedirNuevaCapacidad();
+                            double precio = vista.pedirPrecio();
+                            boolean operativa = vista.pedirEstadoOperativo();
+                            editarHabitacion(hotel, numero, capacidad, precio, operativa);
+                            vista.mostrarMensaje("Habitación modificada correctamente.");
+                        }
+                    }
+                    case '4' -> {
+                        Hotel hotel = seleccionarHotel(vista, controladorHoteles);
+                        if (hotel != null) {
+                            eliminarHabitacion(hotel, vista.pedirNumHabitacion());
+                            vista.mostrarMensaje("Habitación eliminada correctamente.");
+                        }
+                    }
+                    case '0' -> volver = true;
+                    default -> vista.mostrarError("Opción no válida.");
+                }
+            } catch (Exception e) {
+                vista.mostrarError(e.getMessage());
+            }
+        }
+    }
+
+    private Hotel seleccionarHotel(VistaHabitaciones vista, ControladorHoteles controladorHoteles) throws SQLException {
+        Hotel hotel = controladorHoteles.buscarHotel(vista.pedirNombreHotel());
+        if (hotel == null) vista.mostrarError("No existe ningún hotel con ese nombre.");
+        return hotel;
     }
 
     // ********* Auxiliares (privados) *********

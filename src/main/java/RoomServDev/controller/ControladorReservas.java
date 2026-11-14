@@ -7,13 +7,12 @@ import RoomServDev.model.Hotel;
 import RoomServDev.model.Reserva;
 import RoomServDev.model.ReservaSolapadaException;
 import RoomServDev.persistence.dao.ReservaDAO;
+import RoomServDev.view.VistaReservas;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ControladorReservas {
@@ -53,7 +52,6 @@ public class ControladorReservas {
 
         validarFechas(entrada, salida);
         validarHuespedes(habitacion, numHuespedes);
-        comprobarSolapamiento(hotel.getNombre(), numHabitacion, entrada, salida, null);
 
         // Fechas en formato java.sql.Date compatibles con la entidad Reserva
         java.sql.Date fechaHoy = java.sql.Date.valueOf(LocalDate.now());
@@ -102,9 +100,8 @@ public class ControladorReservas {
 
         validarFechas(nuevaEntrada, nuevaSalida);
         validarHuespedes(habitacion, nuevosHuespedes);
-        comprobarSolapamiento(hotel.getNombre(), reserva.getNumHabitacion(), nuevaEntrada, nuevaSalida, reserva);
 
-        // Datos.modificarReserva comprueba el solapamiento y actualiza fechas y huéspedes
+        // El DAO vuelve a validar el solapamiento dentro de su transacción.
         reserva.setFechaEntrada(java.sql.Date.valueOf(nuevaEntrada));
         reserva.setFechaSalida(java.sql.Date.valueOf(nuevaSalida));
         reserva.setNumHuespedes(nuevosHuespedes);
@@ -113,7 +110,7 @@ public class ControladorReservas {
     }
 
     // Cancelar: la reserva queda en el historial pero deja de estar activa
-    public void cancelarReserva(int idReserva) throws SQLException {
+    public void cancelarReserva(int idReserva) throws SQLException, ReservaSolapadaException {
         obtenerReservaActiva(idReserva);
         reservaDAO.actualizarEstado(idReserva, false);
     }
@@ -124,6 +121,54 @@ public class ControladorReservas {
             throw new IllegalArgumentException("No existe ninguna reserva con id " + idReserva);
         }
         reservaDAO.eliminar(idReserva);
+    }
+
+    public void gestionarMenu(VistaReservas vista) {
+        boolean volver = false;
+        while (!volver) {
+            char opcion = vista.mostrarMenuReservas();
+            try {
+                switch (opcion) {
+                    case '1' -> vista.listarReservas(listarReservas());
+                    case '2' -> {
+                        String dni = vista.pedirDni();
+                        String hotel = vista.pedirNombreHotel();
+                        int habitacion = vista.pedirNumHabitacion();
+                        int huespedes = vista.pedirHuespedes();
+                        LocalDate entrada = vista.pedirFechaEntrada();
+                        LocalDate salida = vista.pedirFechaSalida();
+                        Reserva reserva = crearReserva(dni, hotel, habitacion, entrada, salida, huespedes);
+                        vista.mostrarMensaje("Reserva confirmada. Id: " + reserva.getIdReserva()
+                                + ". Importe: " + reserva.getImporteTotal() + "€");
+                    }
+                    case '3' -> {
+                        int id = vista.pedirIdReserva();
+                        LocalDate entrada = vista.pedirNuevaFechaEntrada();
+                        LocalDate salida = vista.pedirNuevaFechaSalida();
+                        int huespedes = vista.pedirNuevosHuespedes();
+                        editarReserva(id, entrada, salida, huespedes);
+                        vista.mostrarMensaje("Reserva modificada correctamente.");
+                    }
+                    case '4' -> {
+                        int id = vista.pedirIdReserva();
+                        String modo = vista.pedirModoCancelacion();
+                        if (modo.equalsIgnoreCase("E")) {
+                            eliminarReserva(id);
+                            vista.mostrarMensaje("Reserva eliminada; las fechas vuelven a estar disponibles.");
+                        } else if (modo.equalsIgnoreCase("C")) {
+                            cancelarReserva(id);
+                            vista.mostrarMensaje("Reserva cancelada; las fechas vuelven a estar disponibles.");
+                        } else {
+                            vista.mostrarError("Indica C para cancelar o E para eliminar.");
+                        }
+                    }
+                    case '0' -> volver = true;
+                    default -> vista.mostrarError("Opción no válida.");
+                }
+            } catch (Exception e) {
+                vista.mostrarError(e.getMessage());
+            }
+        }
     }
 
     // ********* Auxiliares (privados) *********
@@ -159,23 +204,6 @@ public class ControladorReservas {
         }
     }
 
-    // "ignorar" sirve para no comparar una reserva consigo misma
-    private void comprobarSolapamiento(String nombreHotel, int numHabitacion,
-                                       LocalDate entrada, LocalDate salida, Reserva ignorar)
-            throws ReservaSolapadaException, SQLException {
-        for (Reserva r : reservaDAO.obtenerTodas()) {
-            if ((ignorar != null && r.getIdReserva() == ignorar.getIdReserva()) || !r.isEstado()) continue;
-            if (r.getNombreHotel().equalsIgnoreCase(nombreHotel) && r.getNumHabitacion() == numHabitacion) {
-                LocalDate rEntrada = aLocalDate(r.getFechaEntrada());
-                LocalDate rSalida = aLocalDate(r.getFechaSalida());
-                if (entrada.isBefore(rSalida) && salida.isAfter(rEntrada)) {
-                    throw new ReservaSolapadaException("La habitación " + numHabitacion
-                            + " ya está reservada del " + rEntrada + " al " + rSalida);
-                }
-            }
-        }
-    }
-
     private Hotel obtenerHotel(String nombreHotel) throws SQLException {
         Hotel hotel = ctrlHoteles.buscarHotel(nombreHotel);
         if (hotel == null) {
@@ -204,12 +232,4 @@ public class ControladorReservas {
         return reserva;
     }
 
-    // La vista trabaja con LocalDate y el modelo con Date: estos dos métodos convierten
-
-    private LocalDate aLocalDate(Date fecha) {
-        if (fecha instanceof java.sql.Date sqlDate){
-            return sqlDate.toLocalDate();
-        }
-        return fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    }
 }

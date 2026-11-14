@@ -5,7 +5,6 @@ import java.util.List;
 
 import RoomServDev.model.Reserva;
 import RoomServDev.model.ReservaSolapadaException;
-import RoomServDev.model.ReservaSolapadaException;
 
 public interface ReservaDAO {
 
@@ -19,7 +18,7 @@ public interface ReservaDAO {
 
     void actualizar(Reserva reserva) throws SQLException, RoomServDev.model.ReservaSolapadaException;
 
-    void actualizarEstado(int idReserva, boolean activa) throws SQLException;
+    void actualizarEstado(int idReserva, boolean activa) throws SQLException, ReservaSolapadaException;
 
     void eliminar(int idReserva) throws SQLException;
 }

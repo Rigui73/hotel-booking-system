@@ -55,9 +55,11 @@ CREATE TABLE `habitaciones` (
     num_habitacion INT NOT NULL,
     capacidad INT NOT NULL,
     precio_noche DECIMAL(8, 2) NOT NULL,
+    -- Estado operativo/manual; la ocupación para fechas se deriva de reservas activas.
     disponible BOOLEAN NOT NULL DEFAULT TRUE,
     categoria VARCHAR(20) NOT NULL,
     id_hotel INT NOT NULL,
+    CONSTRAINT uq_habitaciones_hotel_numero UNIQUE (id_hotel, num_habitacion),
     CONSTRAINT fk_habitaciones_hoteles
         FOREIGN KEY (id_hotel) REFERENCES hoteles (id_hotel) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

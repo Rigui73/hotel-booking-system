@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import RoomServDev.model.Hotel;
-import RoomServDev.persistence.dao.ConexionBD;
+import RoomServDev.persistence.connection.DatabaseConnection;
 import RoomServDev.persistence.dao.HotelDAO;
 
 public class HotelDAOImpl implements HotelDAO {
@@ -30,7 +30,7 @@ public class HotelDAOImpl implements HotelDAO {
     @Override
     public void insertar(Hotel hotel) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -39,14 +39,16 @@ public class HotelDAOImpl implements HotelDAO {
             ps.setString(3, hotel.getCiudad().trim());
             ps.setInt(4, hotel.getTelefono());
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("No se pudo insertar el hotel.");
+            }
 
             // Recuperar el ID autoincremental generado por MySQL.
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
 
-                if (generatedKeys.next()) {
-                    hotel.setIdHotel(generatedKeys.getInt(1));
-                }
+                if (!generatedKeys.next())
+                    throw new SQLException("MySQL no devolvió el ID del hotel.");
+                hotel.setIdHotel(generatedKeys.getInt(1));
             }
         }
     }
@@ -54,7 +56,7 @@ public class HotelDAOImpl implements HotelDAO {
     @Override
     public Hotel obtenerPorId(int idHotel) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_ID)) {
 
             ps.setInt(1, idHotel);
@@ -77,7 +79,7 @@ public class HotelDAOImpl implements HotelDAO {
             return null;
         }
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_NOMBRE)) {
 
             ps.setString(1, nombre.trim());
@@ -98,7 +100,7 @@ public class HotelDAOImpl implements HotelDAO {
 
         List<Hotel> lista = new ArrayList<>();
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_ALL);
                 ResultSet rs = ps.executeQuery()) {
 
@@ -113,7 +115,7 @@ public class HotelDAOImpl implements HotelDAO {
     @Override
     public void actualizar(Hotel hotel) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_UPDATE)) {
 
             ps.setString(1, hotel.getNombre().trim());
@@ -122,19 +124,23 @@ public class HotelDAOImpl implements HotelDAO {
             ps.setInt(4, hotel.getTelefono());
             ps.setInt(5, hotel.getIdHotel());
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() == 0 && !existeHotel(conn, hotel.getIdHotel())) {
+                throw new SQLException("No existe el hotel " + hotel.getIdHotel() + " para actualizar.");
+            }
         }
     }
 
     @Override
     public void eliminar(int idHotel) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_DELETE)) {
 
             ps.setInt(1, idHotel);
 
-            ps.executeUpdate();
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("No existe el hotel " + idHotel + " para eliminar.");
+            }
         }
     }
 
@@ -152,5 +158,14 @@ public class HotelDAOImpl implements HotelDAO {
         hotel.setTelefono(rs.getInt("telefono"));
 
         return hotel;
+    }
+
+    private boolean existeHotel(Connection conn, int idHotel) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM hoteles WHERE id_hotel = ?")) {
+            ps.setInt(1, idHotel);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 }

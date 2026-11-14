@@ -53,3 +53,6 @@ build/
 
 ### DB CONFIGURATION ###
 db.properties
+
+# Legacy compiled artifacts
+/bin/

@@ -13,7 +13,7 @@ import RoomServDev.model.Doble;
 import RoomServDev.model.Habitacion;
 import RoomServDev.model.Simple;
 import RoomServDev.model.Suite;
-import RoomServDev.persistence.dao.ConexionBD;
+import RoomServDev.persistence.connection.DatabaseConnection;
 import RoomServDev.persistence.dao.HabitacionDAO;
 
 public class HabitacionDAOImpl implements HabitacionDAO {
@@ -46,9 +46,11 @@ public class HabitacionDAOImpl implements HabitacionDAO {
     @Override
     public void insertar(Habitacion habitacion, int idHotel) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion()) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
 
             conn.setAutoCommit(false);
+            int idAnterior = habitacion.getIdHabitacion();
+            int hotelAnterior = habitacion.getIdHotel();
 
             try {
                 int idGenerado;
@@ -63,7 +65,8 @@ public class HabitacionDAOImpl implements HabitacionDAO {
                     ps.setString(5, determinarCategoria(habitacion));
                     ps.setInt(6, idHotel);
 
-                    ps.executeUpdate();
+                    if (ps.executeUpdate() != 1)
+                        throw new SQLException("No se pudo insertar la habitación.");
 
                     try (ResultSet rs = ps.getGeneratedKeys()) {
                         if (!rs.next()) {
@@ -83,7 +86,13 @@ public class HabitacionDAOImpl implements HabitacionDAO {
                 conn.commit();
 
             } catch (SQLException | RuntimeException e) {
-                conn.rollback();
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+                habitacion.setIdHabitacion(idAnterior);
+                habitacion.setIdHotel(hotelAnterior);
                 throw e;
             }
         }
@@ -92,7 +101,7 @@ public class HabitacionDAOImpl implements HabitacionDAO {
     @Override
     public Habitacion obtenerPorId(int idHabitacion) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_ID)) {
 
             ps.setInt(1, idHabitacion);
@@ -112,7 +121,7 @@ public class HabitacionDAOImpl implements HabitacionDAO {
 
         List<Habitacion> habitaciones = new ArrayList<>();
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_HOTEL)) {
 
             ps.setInt(1, idHotel);
@@ -130,7 +139,7 @@ public class HabitacionDAOImpl implements HabitacionDAO {
     @Override
     public void actualizar(Habitacion habitacion) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion()) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
 
             conn.setAutoCommit(false);
 
@@ -160,7 +169,11 @@ public class HabitacionDAOImpl implements HabitacionDAO {
                 conn.commit();
 
             } catch (SQLException | RuntimeException e) {
-                conn.rollback();
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
                 throw e;
             }
         }
@@ -169,11 +182,13 @@ public class HabitacionDAOImpl implements HabitacionDAO {
     @Override
     public void eliminar(int idHabitacion) throws SQLException {
 
-        try (Connection conn = ConexionBD.obtenerConexion();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQL_DELETE)) {
 
             ps.setInt(1, idHabitacion);
-            ps.executeUpdate();
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("No existe la habitación " + idHabitacion + " para eliminar.");
+            }
         }
     }
 

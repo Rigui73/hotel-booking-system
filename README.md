@@ -16,7 +16,7 @@ El proyecto se desarrolla de forma colaborativa en el contexto de la asignatura 
 
 Su objetivo es aplicar los principios de programación orientada a objetos, separación de responsabilidades, patrones de diseño y persistencia de datos mediante JDBC y MySQL.
 
-Actualmente, el proyecto se encuentra en proceso de migración desde una gestión de datos en memoria hacia una arquitectura de persistencia basada en DAO y MySQL.
+La aplicación conecta sus módulos de clientes, hoteles, habitaciones y reservas con MySQL mediante JDBC y DAO. `Datos` se conserva como modelo en memoria legado utilizado por sus pruebas unitarias; no forma parte del arranque de `Main`.
 
 ## Tabla de contenidos
 
@@ -50,7 +50,8 @@ Actualmente, el proyecto se encuentra en proceso de migración desde una gestió
     - [Error de compilación por versión de Java](#error-de-compilación-por-versión-de-java)
     - [Error de tablas inexistentes](#error-de-tablas-inexistentes)
     - [Maven no descarga las dependencias](#maven-no-descarga-las-dependencias)
-    - [Configuración de la Base de Datos](#Configuración-de-la-base-de-datos)
+    - [Configuración de la Base de Datos](#configuración-de-la-base-de-datos)
+    - [⚙️ Configuración de la Base de Datos](#️-configuración-de-la-base-de-datos)
   - [Autores](#autores)
   - [Código de conducta](#código-de-conducta)
   - [Licencia](#licencia)
@@ -63,11 +64,11 @@ La aplicación contempla los siguientes módulos:
 | Módulo | Funcionalidad | Persistencia actual |
 | --- | --- | --- |
 | Clientes | Alta, consulta, modificación y eliminación | MySQL mediante DAO |
-| Hoteles | Gestión de hoteles | Memoria |
-| Habitaciones | Consulta y gestión de habitaciones simples, dobles y suites | Memoria en la aplicación; DAO MySQL implementado |
-| Reservas | Registro y consulta de reservas | Memoria en la aplicación; DAO MySQL implementado |
+| Hoteles | Alta, consulta, modificación y eliminación | MySQL mediante DAO |
+| Habitaciones | Alta, consulta, modificación y eliminación de simples, dobles y suites | MySQL mediante DAO |
+| Reservas | Alta, consulta, modificación, cancelación y eliminación | MySQL mediante DAO y procedimiento almacenado para solapamientos |
 
-La integración completa de todos los módulos con la base de datos se encuentra pendiente.
+La creación, modificación, cancelación y eliminación de reservas comprueba la disponibilidad del periodo; la columna `disponible` representa el estado operativo de la habitación.
 
 ## Tecnologías
 
@@ -135,22 +136,26 @@ Maven reconocerá automáticamente el archivo `pom.xml`.
 
 El proyecto incluye dos scripts SQL:
 
-- `src/main/resources/bbdd/schema.sql`: creación de la base de datos y sus tablas.
-- `src/main/resources/bbdd/data.sql`: inserción de datos iniciales de prueba.
+- `src/main/resources/bbdd/install/schema.sql`: creación de la base de datos y sus tablas.
+- `src/main/resources/bbdd/sample-data/data.sql`: inserción de datos iniciales de prueba.
+- `src/main/resources/bbdd/procedures/procedures.sql`: procedimiento usado por el DAO de reservas.
+- `src/main/resources/bbdd/migrations/001_reservation_integrity.sql`: migración incremental para bases ya existentes; ejecutar una sola vez después de comprobar que faltan ambos objetos.
 
 Abre MySQL Workbench o una herramienta compatible con MySQL.
 
 Ejecuta primero:
 
 ```text
-src/main/resources/bbdd/schema.sql
+src/main/resources/bbdd/install/schema.sql
 ```
 
 Después ejecuta:
 
 ```text
-src/main/resources/bbdd/data.sql
+src/main/resources/bbdd/sample-data/data.sql
 ```
+
+Por último, ejecuta `src/main/resources/bbdd/procedures/procedures.sql` para crear el procedimiento almacenado que comprueba solapamientos de reservas. No reemplaza un procedimiento que ya exista. En una base existente, no ejecutes `schema.sql`; inspecciona el estado y aplica únicamente la migración incremental que corresponda. `001_reservation_integrity.sql` es de una sola ejecución y fallará si alguno de sus objetos ya existe.
 
 **Importante:** `schema.sql` contiene instrucciones `DROP TABLE IF EXISTS`. Al ejecutarlo se eliminan las tablas existentes antes de recrearlas. Utilízalo únicamente en un entorno de desarrollo o cuando tengas claro que puedes perder los datos anteriores.
 
@@ -232,6 +237,23 @@ Maven descargará las dependencias necesarias y compilará el proyecto.
 3. Pulsa el icono **Run** situado junto al método.
 4. La aplicación iniciará su menú principal.
 
+### Generar y ejecutar el JAR ejecutable
+
+El proyecto puede empaquetarse desde IntelliJ IDEA sin crear artefactos manuales:
+
+1. Abre el proyecto como proyecto Maven y recarga las dependencias.
+2. En el panel **Maven**, ejecuta **Lifecycle > package**.
+3. El JAR ejecutable se genera en `target/hotel-booking-system-1.0-SNAPSHOT.jar`.
+
+Desde un terminal situado en la raíz del proyecto, ejecuta:
+
+```powershell
+mvn clean package
+java -jar target/hotel-booking-system-1.0-SNAPSHOT.jar
+```
+
+Se requiere Java 21 o superior, un servidor MySQL iniciado, la base de datos preparada y un `src/main/resources/db.properties` local configurado. El archivo local de conexión no se incorpora al JAR; el manifiesto permite que el JAR generado en `target/` lea ese recurso desde `src/main/resources/` dentro del clon del repositorio. No distribuyas `db.properties`.
+
 La aplicación necesita que MySQL esté iniciado y que `db.properties` contenga una configuración válida para utilizar el módulo de clientes.
 
 ### Ejecutar las pruebas
@@ -270,7 +292,6 @@ Actualmente encontramos:
 | --- | --- | --- |
 | `TestDatos.java` | JUnit 5 | Comprobar operaciones del modelo en memoria |
 | `TestDatabaseConnection.java` | Prueba manual | Comprobar la conexión JDBC |
-| `TestHabitacionDAO.java` | Prueba manual | Comprobar operaciones DAO de habitaciones |
 
 Las pruebas JUnit se ejecutan automáticamente mediante Maven.
 
@@ -364,6 +385,8 @@ La base de datos contempla las siguientes tablas:
 Las habitaciones utilizan una tabla principal y tablas específicas para almacenar los atributos de cada subtipo.
 
 Las relaciones entre tablas se implementan mediante claves primarias y foráneas.
+
+El campo `habitaciones.disponible` representa si la habitación está operativa para reservar. La ocupación para unas fechas concretas se determina consultando las reservas activas; cancelar o eliminar una reserva no cambia este estado operativo.
 
 ## Buenas prácticas de desarrollo
 
